@@ -379,34 +379,34 @@ namespace sparta_dungeon
             Gold = gold;
         }
 
-        public static int CheckInput(int min, int max)
-        {
-            static void WrongInput()
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("잘못된 입력입니다!");
-                Console.ResetColor();
-            }
-            var top = Console.CursorTop;
+        //public static int CheckInput(int min, int max)
+        //{
+        //    static void WrongInput()
+        //    {
+        //        Console.ForegroundColor = ConsoleColor.Red;
+        //        Console.WriteLine("잘못된 입력입니다!");
+        //        Console.ResetColor();
+        //    }
+        //    var top = Console.CursorTop;
 
-            while (true)
-            {
-                wrongInputRemover(top);
-                var inputParse = -1;
-                if (!int.TryParse(Console.ReadLine(), out inputParse)) //TryParse를 이용해 해결하는 방법으로 변환
-                    inputParse = -1;
-                if (inputParse >= min && inputParse <= max)
-                    return inputParse;
-                else
-                    WrongInput();
-            }
-            static void wrongInputRemover(int top)
-            {
-                Console.SetCursorPosition(0, top);
-                Console.WriteLine("                                     ");
-                Console.SetCursorPosition(0, top);
-            }
-        }
+        //    while (true)
+        //    {
+        //        wrongInputRemover(top);
+        //        var inputParse = -1;
+        //        if (!int.TryParse(Console.ReadLine(), out inputParse)) //TryParse를 이용해 해결하는 방법으로 변환
+        //            inputParse = -1;
+        //        if (inputParse >= min && inputParse <= max)
+        //            return inputParse;
+        //        else
+        //            WrongInput();
+        //    }
+        //    static void wrongInputRemover(int top)
+        //    {
+        //        Console.SetCursorPosition(0, top);
+        //        Console.WriteLine("                                     ");
+        //        Console.SetCursorPosition(0, top);
+        //    }
+        //}
 
         public void SelectName(Character character)     // 이름 선택 화면
         {
@@ -420,7 +420,7 @@ namespace sparta_dungeon
                 isCorrectName = true;
                 Console.WriteLine($"선택하신 이름은 {playerName}입니다.");
                 Console.WriteLine("1. 네  2. 아니오");
-                int acton = CheckInput(1, 2);
+                int acton = Program.CheckInput(1, 2);
 
                 if (acton == 1)
                 {
@@ -461,7 +461,7 @@ namespace sparta_dungeon
             while(isCorrectNum == false)
             {
                 isCorrectNum = true;
-                int acton = CheckInput(1, 3);
+                int acton = Program.CheckInput(1, 3);
 
                 switch (acton)
                 {
