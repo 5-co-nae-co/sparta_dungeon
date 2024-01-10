@@ -12,7 +12,9 @@ namespace sparta_dungeon
         static Inventory inventory = new Inventory();
         static void settings()
         {
-            player = new Character(1, "마법사", "이호열", 10, 5, 100, 1500);
+            player = new Character(1, "", "", 0, 0, 0, 0);        //Charater 객체 생성
+            player.SelectName(player);                            //플레이어 이름 설정
+            player.SelectJob(player);                             //플레이어 직업 선택                        
 
             Item ChainArmor = new Item("무쇠 갑옷", 0, 10, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 300);
             inventory.Add(ChainArmor);
@@ -31,7 +33,7 @@ namespace sparta_dungeon
         }
         static void Start()
         {
-            Console.Clear();
+            Console.WriteLine();
             Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
             Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.");
             Console.WriteLine("1. 상태 보기");
@@ -71,15 +73,18 @@ namespace sparta_dungeon
             {
                 if (!item.isEquiped)
                 {
-                    Console.WriteLine("변경사항 없음");    
+                    Console.WriteLine("변경사항 없음");
                 }
-                if (item.Offense != 0)
+                else if (item.isEquiped)                        // if 문으로 되어있어서 스탯창만 열어도 아이템의 능력치가 추가되는 현상 수정
                 {
-                    player.Offense += item.Offense;
-                }
-                if (item.Defense != 0)
-                {
-                    player.Defence += item.Defense;
+                    if (item.Offense != 0)
+                    {
+                        player.Offense += item.Offense;
+                    }
+                    if (item.Defense != 0)
+                    {
+                        player.Defence += item.Defense;
+                    }
                 }
             }
 
@@ -91,7 +96,7 @@ namespace sparta_dungeon
             Console.WriteLine("상태 보기");
             Console.WriteLine("캐릭터의 정보가 표시됩니다.");
             Console.WriteLine($"Lv. {player.Lv}");
-            Console.WriteLine($"Chad ( {player.Job} )");
+            Console.WriteLine($"{player.Name} ( {player.Job} )");        //"Chad > {player.Name}
             Console.WriteLine($"공격력 : {player.Offense}");
             Console.WriteLine($"방어력 : {player.Defence}");
             Console.WriteLine($"체력 : {player.Hp}");
@@ -318,11 +323,8 @@ namespace sparta_dungeon
                 }
             } while (isMain);
         }
-
-       
-
     }
-
+    
     class Character
     {
         public int Lv;
@@ -347,6 +349,84 @@ namespace sparta_dungeon
             Defence = defense;
             Hp = hp;
             Gold = gold;
+        }
+
+        public void SelectName(Character character)     // 이름 선택 화면
+        {
+            bool isCorrectName = false;
+            int selectNum = 0;
+
+            while(isCorrectName == false)
+            {
+                Console.WriteLine("플레이어의 이름을 입력해주세요.");
+                string playerName = Console.ReadLine();
+                isCorrectName = true;
+                Console.WriteLine($"선택하신 이름은 {playerName}입니다.");
+                Console.WriteLine("1. ㅇㅇ  2. ㄴㄴ");
+                selectNum = int.Parse(Console.ReadLine());
+                
+                if(selectNum == 1)
+                {
+                    character.Name = playerName;
+                    isCorrectName = true;
+                }
+                else if(selectNum == 2)
+                {
+                    isCorrectName = false;
+                }
+            }
+        }
+
+        public void SelectJob(Character character)         // 직업 선택화면
+        {
+            int selectNum = 0;
+            bool isCorrectNum = false;
+            
+            Console.WriteLine("직업을 선택해주세요.");
+            Console.WriteLine("1. 전사  2. 도적 3. 궁수");
+
+            while(isCorrectNum == false)
+            {
+                isCorrectNum = true;
+                selectNum = int.Parse(Console.ReadLine());
+
+                switch (selectNum)
+                {
+                    case 1 :
+                        Console.WriteLine("선택한 직업은 전사입니다.");
+                        character.Lv = 1;
+                        character.Job = "전사";
+                        character.Offense = 10;
+                        character.Defence = 10;
+                        character.Hp = 200;
+                        character.Gold = 1500;
+                        break;
+                    case 2 :
+                        Console.WriteLine("선택한 직업은 도적입니다.");
+                        character.Lv = 1;
+                        character.Job = "도적";
+                        character.Offense = 20;
+                        character.Defence = 5;
+                        character.Hp = 100;
+                        character.Gold = 1500;
+                        break;
+                    case 3 :
+                        Console.WriteLine("선택한 직업은 궁수입니다.");
+                        character.Lv = 1;
+                        character.Job = "궁수";
+                        character.Offense = 15;
+                        character.Defence = 5;
+                        character.Hp = 150;
+                        character.Gold = 1500;
+                        break;
+                    default:
+                        Console.WriteLine("1,2,3 숫자 중 하나를 선택해주세요.");
+                        isCorrectNum = false;
+                        break;
+                }
+            }
+
+
         }
 
         public void EquipWeapon(Item item)
@@ -375,7 +455,6 @@ namespace sparta_dungeon
                 isEquipedArmor = false;
             }
         }
-
     }
     public class Item
     {
@@ -410,10 +489,6 @@ namespace sparta_dungeon
         {
             itemList.Add(item);
         }
-
-        
-        
-
 
         public void isEquipedInventory()
         {
