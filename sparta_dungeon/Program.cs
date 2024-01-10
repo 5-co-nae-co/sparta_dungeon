@@ -358,7 +358,7 @@ namespace sparta_dungeon
                 {
                     QuestSecond();
                 }
-                else if (acton == 2)
+                else if (acton == 3)
                 {
                     QuestThird();
                 }
