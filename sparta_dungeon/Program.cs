@@ -29,6 +29,36 @@ namespace sparta_dungeon
             settings();
             Start();
         }
+        
+        //min max까지 인풋 입력 가능 및 매개변수로 받은 인풋이 숫자인지 판단하는 메서드
+        static int CheckInput(int min, int max) 
+        {
+            static void WrongInput()
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("잘못된 입력입니다!");
+                Console.ResetColor();
+            }
+            var top = Console.CursorTop;
+
+            while (true)
+            {
+                wrongInputRemover(top);
+                var inputParse = -1;
+                if (!int.TryParse(Console.ReadLine(), out inputParse)) //TryParse를 이용해 해결하는 방법으로 변환
+                    inputParse = -1;
+                if (inputParse >= min && inputParse <= max)
+                    return inputParse;
+                else
+                    WrongInput();
+            }
+            static void wrongInputRemover(int top)
+            {
+                Console.SetCursorPosition(0, top);
+                Console.WriteLine("                                     ");
+                Console.SetCursorPosition(0, top);
+            }
+        }
         static void Start()
         {
             Console.Clear();
@@ -39,54 +69,49 @@ namespace sparta_dungeon
             Console.WriteLine("3. 상점");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
-            int acton = int.Parse(Console.ReadLine());
-            bool isMain = true;
-            do
+            int acton = CheckInput(1, 3);
+            while(true)
             {
-                isMain = false;
                 if (acton == 1)
                 {
                     State();
+                    break;
                 }
                 else if (acton == 2)
                 {
                     Inventory();
+                    break;
                 }
                 else if (acton == 3)
                 {
                     Shop();
-                }
-                else
-                {
-                    Console.WriteLine("잘못된 입력입니다.");
-                    acton = int.Parse(Console.ReadLine());
-                    isMain = true;
-                }
-            } while (isMain);
-        }
-        //반복적으로 State 진입시에 플레이어 스텟이 추가되지 않도록 추가해야함.
-        static void StateUpdate()
-        {
-            foreach (Item item in inventory.itemList)
-            {
-                if (!item.isEquiped)
-                {
-                    Console.WriteLine("변경사항 없음");    
-                }
-                if (item.Offense != 0)
-                {
-                    player.Offense += item.Offense;
-                }
-                if (item.Defense != 0)
-                {
-                    player.Defence += item.Defense;
+                    break;
                 }
             }
-
         }
+        //반복적으로 State 진입시에 플레이어 스텟이 추가되지 않도록 추가해야함.
+        //static void StateUpdate()
+        //{
+        //    foreach (Item item in inventory.itemList)
+        //    {
+        //        if (!item.isEquiped)
+        //        {
+        //            Console.WriteLine("변경사항 없음");    
+        //        }
+        //        if (item.Offense != 0)
+        //        {
+        //            player.Offense += item.Offense;
+        //        }
+        //        if (item.Defense != 0)
+        //        {
+        //            player.Defence += item.Defense;
+        //        }
+        //    }
+
+        //}
         static void State()
         {
-            StateUpdate();
+            //StateUpdate();
             Console.Clear();
             Console.WriteLine("상태 보기");
             Console.WriteLine("캐릭터의 정보가 표시됩니다.");
@@ -103,22 +128,15 @@ namespace sparta_dungeon
             Console.WriteLine(">>");
 
 
-            int acton = int.Parse(Console.ReadLine());
-            bool isMain = true;
-            do
+            int acton = CheckInput(0, 0);
+            while(true)
             {
-                isMain = false;
                 if (acton == 0)
                 {
                     Start();
+                    break;
                 }
-                else
-                {
-                    Console.WriteLine("잘못된 입력입니다.");
-                    acton = int.Parse(Console.ReadLine());
-                    isMain = true;
-                }
-            } while (isMain);
+            }
         }
 
         static void Inventory()
@@ -139,26 +157,20 @@ namespace sparta_dungeon
             Console.WriteLine(">>");
 
             List<Item> itemList = inventory.itemList;
-            int acton = int.Parse(Console.ReadLine());
-            bool isMain = true;
-            do
+            int acton = CheckInput(0, 1);
+            while(true)
             {
-                isMain = false;
                 if (acton == 0)
                 {
                     Start();
+                    break;
                 }
                 else if (acton == 1)
                 {
                     isEquipedInventory();
+                    break;
                 }
-                else
-                {
-                    Console.WriteLine("잘못된 입력입니다.");
-                    acton = int.Parse(Console.ReadLine());
-                    isMain = true;
-                }
-            } while (isMain);
+            }
         }
 
         static void isEquipedInventory()
@@ -178,15 +190,13 @@ namespace sparta_dungeon
             Console.WriteLine(">>");
 
             List<Item> itemList = inventory.itemList;
-            int acton = int.Parse(Console.ReadLine());
-            bool isMain = true;
-            do
+            int acton = CheckInput(0, 4);
+            while(true)
             {
-                isMain = false;
-
                 if (acton == 0)
                 {
-                    Start();
+                    Inventory();
+                    break;
                 }
                 else if (acton == 1 || acton == 2 || acton == 3|| acton == 4)
                 {
@@ -200,19 +210,13 @@ namespace sparta_dungeon
                     {
                         inputItem.isEquiped = false;
                     }
-                    isEquipedInventory();
                 }
-                else
-                {
-                    Console.WriteLine("잘못된 입력입니다.");
-                    acton = int.Parse(Console.ReadLine());
-                    isMain = true;
-                }
-            } while (isMain);
+                isEquipedInventory();
+            }
         }
-        static void Shop()
+
+        static void ShopInterface()
         {
-            Console.Clear();
             Console.WriteLine("상점");
             Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
 
@@ -224,68 +228,61 @@ namespace sparta_dungeon
             Console.WriteLine("[모든 아이템 목록]");
 
             inventory.DisplayShop();
+        }
+        static void Shop()
+        {
+            Console.Clear();
+            ShopInterface();
 
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
             Console.WriteLine("1. 아이템 구매");
+            Console.WriteLine("2. 아이템 판매");
             Console.WriteLine();
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
 
-            int acton = int.Parse(Console.ReadLine());
-            bool isMain = true;
-            do
+            int acton = CheckInput(0, 2);
+            while(true)
             {
-                isMain = false;
 
                 if (acton == 0)
                 {
                     Start();
+                    break;
                 }
                 else if (acton == 1)
                 {
                     ShopBuy();
+                    break;
                 }
-                else
+                else if (acton == 2)
                 {
-                    Console.WriteLine("잘못된 입력입니다.");
-                    acton = int.Parse(Console.ReadLine());
-                    isMain = true;
+                    ShopSell();
+                    break;
                 }
-            } while (isMain);
+            }
         }
 
         static void ShopBuy()
         {
             Console.Clear();
-            Console.WriteLine("상점 - 아이템 구매");
-            Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
-
-            Console.WriteLine();
-            Console.WriteLine("[보유 골드]");
-            Console.WriteLine($"{player.Gold} G");
-
-            Console.WriteLine();
-            Console.WriteLine("[구매가능한 아이템 목록]");
-
-            inventory.DisplayShop();
+            ShopInterface();
 
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
-            Console.WriteLine("1. 아이템 구매");
             Console.WriteLine();
-            Console.WriteLine("원하시는 행동을 입력해주세요.");
+            Console.WriteLine("구매를 원하시는 아이템의 번호를 입력해주세요.");
             Console.WriteLine(">>");
 
             List<Item> itemList = inventory.itemlist();
-            int acton = int.Parse(Console.ReadLine());
-            bool isMain = true;
-            do
+            int acton = CheckInput(0, 4);
+            while(true)
             {
-                isMain = false;
                 if (acton == 0)
                 {
                     Shop();
+                    break;
                 }
                 
                 else if (acton == 1 || acton == 2 || acton == 3 || acton == 4)
@@ -293,9 +290,11 @@ namespace sparta_dungeon
                     Item inputItem = itemList[acton - 1];
                     if (inputItem.isBuy)
                     {
-                        Console.WriteLine("이미 구매한 상품입니다.");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("이미 구매한 상품 입니다.");
+                        Console.ResetColor();
+                        Console.WriteLine("확인을 위해 아무 키나 눌러주세요");
                         Console.ReadLine();
-
                     }
                     else if (inputItem.saleGold <= player.Gold)
                     {
@@ -304,22 +303,51 @@ namespace sparta_dungeon
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Gold가 부족합니다.");
+                        Console.ResetColor();
+                        Console.WriteLine("확인을 위해 아무 키나 눌러주세요");
                         Console.ReadLine();
                     }
                     ShopBuy();
                 }
+            }
+        }
+        static void ShopSell()
+        {
+            Console.Clear();
+            ShopInterface();
 
-                else
+            Console.WriteLine();
+            Console.WriteLine("0. 나가기");
+            Console.WriteLine();
+            Console.WriteLine("판매를 원하시는 아이템의 번호를 입력해주세요.");
+            Console.WriteLine(">>");
+
+            List<Item> itemList = inventory.itemlist();
+            int acton = CheckInput(0, 4);
+            while(true)
+            {
+                if (acton == 0)
                 {
-                    Console.WriteLine("잘못된 입력입니다.");
-                    acton = int.Parse(Console.ReadLine());
-                    isMain = true;
+                    Shop();
+                    break;
                 }
-            } while (isMain);
+
+                else if (acton == 1 || acton == 2 || acton == 3 || acton == 4)
+                {
+                    Item inputItem = itemList[acton - 1];
+                    if (inputItem.isBuy)
+                    {
+                        inputItem.isBuy = false;
+                        player.Gold += inputItem.saleGold;
+                    }
+                }
+                ShopSell();
+            }
         }
 
-       
+
 
     }
 
