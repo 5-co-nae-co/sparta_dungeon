@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO.Pipes;
 using System.Net.Security;
 using System.Numerics;
@@ -37,6 +38,7 @@ namespace sparta_dungeon
             Console.WriteLine("1. 상태 보기");
             Console.WriteLine("2. 인벤토리");
             Console.WriteLine("3. 상점");
+            Console.WriteLine("4. 임무");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
             int acton = int.Parse(Console.ReadLine());
@@ -55,6 +57,10 @@ namespace sparta_dungeon
                 else if (acton == 3)
                 {
                     Shop();
+                }
+                else if (acton == 4)
+                {
+                    QusetMenu();
                 }
                 else
                 {
@@ -319,9 +325,165 @@ namespace sparta_dungeon
             } while (isMain);
         }
 
-       
+        /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        static void QusetMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("■ Quest!! ■");
+            Console.WriteLine("");
+            Console.WriteLine("1.적을 처치");
+            Console.WriteLine("2.장비를 장착하기");
+            Console.WriteLine("3.더욱 더 강해지기!");
+            Console.WriteLine("");
+            Console.WriteLine("0. 나가기");
+            Console.WriteLine("");
+
+            int acton = int.Parse(Console.ReadLine());
+            bool isMain = true;
+            do
+            {
+                isMain = false;
+
+                if (acton == 0)
+                {
+                    Start();
+                }
+
+                else if (acton == 1)
+                {
+                    QuestFirst();
+                }
+                else if (acton == 2)
+                {
+                    QuestSecond();
+                }
+                else if (acton == 2)
+                {
+                    QuestThird();
+                }
+            } while (isMain);
+
+        }
+
+        static void QuestFirst()
+        {
+            Console.Clear();
+            Console.WriteLine("■ Quest!! ■");
+            Console.WriteLine("");
+            Console.WriteLine("적을 처치");
+            Console.WriteLine("");
+            Console.WriteLine("이봐! 적들이 많아졌어.\n안전을 위해서라도 수를 줄여야겠는데.\n자네가 좀 처치해주게!");
+            Console.WriteLine("");
+            Console.WriteLine("적 3마리 처치 (0/3)");
+            Console.WriteLine("");
+            Console.WriteLine("-보상-   \n[칭호]숙련된전사");
+            Console.WriteLine("");
+            Console.WriteLine("0. 나가기");
+            int acton = int.Parse(Console.ReadLine());
+            bool isMain = true;
+
+            do
+            {
+                isMain = false;
+
+                if (acton == 0)
+                {
+                    Start();
+                }
+                else
+                {
+                    Console.WriteLine("잘못된 입력입니다.");
+                    acton = int.Parse(Console.ReadLine());
+                    isMain = true;
+                }
+            } while (isMain);
+
+
+        }
+
+        static void QuestSecond()
+        {
+            Console.Clear();
+            Console.WriteLine("■ Quest!! ■");
+            Console.WriteLine("");
+            Console.WriteLine("장비를 장착하기");
+            Console.WriteLine("");
+            Console.WriteLine("이봐! 모험은 처음이지?\n장비는 모험의 기본이지.\n한 번 잡아보라구!");
+            Console.WriteLine("");
+            Console.WriteLine("'장비관리'에서 장비를 장착하기");
+            Console.WriteLine("");
+            Console.WriteLine("-보상-   \nGold 500");
+            Console.WriteLine("");
+            Console.WriteLine("0. 나가기");
+            int acton = int.Parse(Console.ReadLine());
+            bool isMain = true;
+
+            do
+            {
+                isMain = false;
+
+                if (acton == 0)
+                {
+                    Start();
+                }
+                else
+                {
+                    Console.WriteLine("잘못된 입력입니다.");
+                    acton = int.Parse(Console.ReadLine());
+                    isMain = true;
+                }
+            } while (isMain);
+        }
+        static void QuestThird()
+        {
+            Console.Clear();
+            Console.WriteLine("■ Quest!! ■");
+            Console.WriteLine("");
+            Console.WriteLine("더욱 더 강해지기!");
+            Console.WriteLine("");
+            Console.WriteLine("어엿한 모험가로군\n모험의 첫걸음을 옮길 때가 왔어.\n앞길을 막는 녀석은 모두 날려버려.");
+            Console.WriteLine("");
+            Console.WriteLine("'장비관리'에서 장비를 장착하기");
+            Console.WriteLine("");
+            Console.WriteLine("-보상-   \nGold 500");
+            Console.WriteLine("");
+            Console.WriteLine("0. 나가기");
+            int acton = int.Parse(Console.ReadLine());
+            bool isMain = true;
+
+            do
+            {
+                isMain = false;
+
+                if (acton == 0)
+                {
+                    Start();
+                }
+                else
+                {
+                    Console.WriteLine("잘못된 입력입니다.");
+                    acton = int.Parse(Console.ReadLine());
+                    isMain = true;
+                }
+            } while (isMain);
+        }
+
+
+
+
+        /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
     }
+
+
+
+
+
+
+
 
     class Character
     {
