@@ -33,7 +33,7 @@ namespace sparta_dungeon
         }
         
         //min max까지 인풋 입력 가능 및 매개변수로 받은 인풋이 숫자인지 판단하는 메서드
-        static int CheckInput(int min, int max) 
+        public static int CheckInput(int min, int max) 
         {
             static void WrongInput()
             {
@@ -379,35 +379,80 @@ namespace sparta_dungeon
             Gold = gold;
         }
 
+        public static int CheckInput(int min, int max)
+        {
+            static void WrongInput()
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("잘못된 입력입니다!");
+                Console.ResetColor();
+            }
+            var top = Console.CursorTop;
+
+            while (true)
+            {
+                wrongInputRemover(top);
+                var inputParse = -1;
+                if (!int.TryParse(Console.ReadLine(), out inputParse)) //TryParse를 이용해 해결하는 방법으로 변환
+                    inputParse = -1;
+                if (inputParse >= min && inputParse <= max)
+                    return inputParse;
+                else
+                    WrongInput();
+            }
+            static void wrongInputRemover(int top)
+            {
+                Console.SetCursorPosition(0, top);
+                Console.WriteLine("                                     ");
+                Console.SetCursorPosition(0, top);
+            }
+        }
+
         public void SelectName(Character character)     // 이름 선택 화면
         {
             bool isCorrectName = false;
             int selectNum = 0;
 
-            while(isCorrectName == false)
+            while (isCorrectName == false)
             {
                 Console.WriteLine("플레이어의 이름을 입력해주세요.");
                 string playerName = Console.ReadLine();
                 isCorrectName = true;
                 Console.WriteLine($"선택하신 이름은 {playerName}입니다.");
-                Console.WriteLine("1. ㅇㅇ  2. ㄴㄴ");
-                selectNum = int.Parse(Console.ReadLine());
-                
-                if(selectNum == 1)
+                Console.WriteLine("1. 네  2. 아니오");
+                int acton = CheckInput(1, 2);
+
+                if (acton == 1)
                 {
                     character.Name = playerName;
                     isCorrectName = true;
                 }
-                else if(selectNum == 2)
+                else if (acton == 2)
                 {
                     isCorrectName = false;
                 }
+
+                //Console.WriteLine("플레이어의 이름을 입력해주세요.");
+                //string playerName = Console.ReadLine();
+                //isCorrectName = true;
+                //Console.WriteLine($"선택하신 이름은 {playerName}입니다.");
+                //Console.WriteLine("1. 네  2. 아니오");
+                //selectNum = int.Parse(Console.ReadLine());
+
+                //if(selectNum == 1)
+                //{
+                //    character.Name = playerName;
+                //    isCorrectName = true;
+                //}
+                //else if(selectNum == 2)
+                //{
+                //    isCorrectName = false;
+                //}
             }
         }
 
         public void SelectJob(Character character)         // 직업 선택화면
         {
-            int selectNum = 0;
             bool isCorrectNum = false;
             
             Console.WriteLine("직업을 선택해주세요.");
@@ -416,9 +461,9 @@ namespace sparta_dungeon
             while(isCorrectNum == false)
             {
                 isCorrectNum = true;
-                selectNum = int.Parse(Console.ReadLine());
+                int acton = CheckInput(1, 3);
 
-                switch (selectNum)
+                switch (acton)
                 {
                     case 1 :
                         Console.WriteLine("선택한 직업은 전사입니다.");
@@ -446,10 +491,6 @@ namespace sparta_dungeon
                         character.Defence = 5;
                         character.Hp = 150;
                         character.Gold = 1500;
-                        break;
-                    default:
-                        Console.WriteLine("1,2,3 숫자 중 하나를 선택해주세요.");
-                        isCorrectNum = false;
                         break;
                 }
             }
