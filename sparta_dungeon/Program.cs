@@ -16,13 +16,14 @@ namespace sparta_dungeon
 
             Item ChainArmor = new Item("무쇠 갑옷", 0, 10, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 300);
             inventory.Add(ChainArmor);
-            Item OldSword = new Item("낡은 검", 10, 0, "낡은 검", false, false, 400);
+            Item OldSword = new Item("낡은 검", 10, 0, "쉽게 볼 수 있는 낡은 검 입니다", false, false, 400);
             inventory.Add(OldSword);
             Item SpartaSpear = new Item("스파르타 창", 15, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 500);
             inventory.Add(SpartaSpear);
             Item SpartaArmor = new Item("스파르타 갑옷", 0, 20, "스파르타 전사들이 입던 갑옷입니다.", false, false, 3000);
             inventory.Add(SpartaArmor);
         }
+
 
         public static void Main()
         {
@@ -31,7 +32,7 @@ namespace sparta_dungeon
         }
         
         //min max까지 인풋 입력 가능 및 매개변수로 받은 인풋이 숫자인지 판단하는 메서드
-        static int CheckInput(int min, int max) 
+        public static int CheckInput(int min, int max) 
         {
             static void WrongInput()
             {
@@ -59,7 +60,7 @@ namespace sparta_dungeon
                 Console.SetCursorPosition(0, top);
             }
         }
-        static void Start()
+        public static void Start()
         {
             Console.Clear();
             Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
@@ -156,7 +157,7 @@ namespace sparta_dungeon
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
 
-            List<Item> itemList = inventory.itemList;
+            List<Item> itemList = inventory.inventoryList;
             int acton = CheckInput(0, 1);
             while(true)
             {
@@ -173,7 +174,7 @@ namespace sparta_dungeon
             }
         }
 
-        static void isEquipedInventory()
+        public static void isEquipedInventory()
         {
             Console.Clear();
             Console.WriteLine("인벤토리 - 장착 관리");
@@ -186,10 +187,10 @@ namespace sparta_dungeon
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
             Console.WriteLine();
-            Console.WriteLine("원하시는 행동을 입력해주세요.");
+            Console.WriteLine("장착을 원하시는 아이템의 번호를 입력해주세요.");
             Console.WriteLine(">>");
 
-            List<Item> itemList = inventory.itemList;
+            List<Item> itemList = inventory.inventoryList;
             int acton = CheckInput(0, 4);
             while(true)
             {
@@ -198,7 +199,7 @@ namespace sparta_dungeon
                     Inventory();
                     break;
                 }
-                else if (acton == 1 || acton == 2 || acton == 3|| acton == 4)
+                else if (acton <= itemList.Count)
                 {
                     Item inputItem = itemList[acton - 1];
                     player.EquipWeapon(inputItem);
@@ -226,13 +227,12 @@ namespace sparta_dungeon
 
             Console.WriteLine();
             Console.WriteLine("[모든 아이템 목록]");
-
-            inventory.DisplayShop();
         }
         static void Shop()
         {
             Console.Clear();
             ShopInterface();
+            inventory.DisplayShop();
 
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
@@ -268,6 +268,7 @@ namespace sparta_dungeon
         {
             Console.Clear();
             ShopInterface();
+            inventory.DisplayShop();
 
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
@@ -275,8 +276,8 @@ namespace sparta_dungeon
             Console.WriteLine("구매를 원하시는 아이템의 번호를 입력해주세요.");
             Console.WriteLine(">>");
 
-            List<Item> itemList = inventory.itemlist();
-            int acton = CheckInput(0, 4);
+            List<Item> itemList = inventory.shopItemList;
+            int acton = CheckInput(0, itemList.Count);
             while(true)
             {
                 if (acton == 0)
@@ -285,7 +286,7 @@ namespace sparta_dungeon
                     break;
                 }
                 
-                else if (acton == 1 || acton == 2 || acton == 3 || acton == 4)
+                else if (acton <= itemList.Count)
                 {
                     Item inputItem = itemList[acton - 1];
                     if (inputItem.isBuy)
@@ -298,8 +299,9 @@ namespace sparta_dungeon
                     }
                     else if (inputItem.saleGold <= player.Gold)
                     {
-                        inputItem.isBuy = true;
+                        inventory.inventoryList.Add(inputItem);
                         player.Gold -= inputItem.saleGold;
+                        inputItem.isBuy = true;
                     }
                     else
                     {
@@ -317,6 +319,7 @@ namespace sparta_dungeon
         {
             Console.Clear();
             ShopInterface();
+            inventory.SellingInventory(); ;
 
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
@@ -324,8 +327,8 @@ namespace sparta_dungeon
             Console.WriteLine("판매를 원하시는 아이템의 번호를 입력해주세요.");
             Console.WriteLine(">>");
 
-            List<Item> itemList = inventory.itemlist();
-            int acton = CheckInput(0, 4);
+            List<Item> itemList = inventory.inventoryList;
+            int acton = CheckInput(0, itemList.Count);
             while(true)
             {
                 if (acton == 0)
@@ -334,12 +337,12 @@ namespace sparta_dungeon
                     break;
                 }
 
-                else if (acton == 1 || acton == 2 || acton == 3 || acton == 4)
+                else if (acton <= itemList.Count)
                 {
                     Item inputItem = itemList[acton - 1];
                     if (inputItem.isBuy)
                     {
-                        inputItem.isBuy = false;
+                        inventory.inventoryList.Remove(inputItem);
                         player.Gold += inputItem.saleGold;
                     }
                 }
@@ -428,30 +431,36 @@ namespace sparta_dungeon
     }
     public class Inventory
     {
-        public List<Item> itemList;
+        public List<Item> inventoryList;
+        public List<Item> shopItemList;
         public Inventory()
         {
-            itemList = new List<Item>();
+            inventoryList = new List<Item>();
+            shopItemList = new List<Item>();
         }
 
         public void Add(Item item)
         {
-            itemList.Add(item);
+            shopItemList.Add(item);
         }
 
-        
-        
 
+        
+        
 
         public void isEquipedInventory()
         {
-            foreach (Item item in itemList.Where(item => item.isBuy))
+            int i = 0;
+            foreach (Item item in inventoryList.Where(item => item.isBuy))
             {
+                i++;
+                Console.WriteLine();
                 Console.Write("- ");
+                Console.Write(i + " ");
 
                 if (item.isEquiped) 
                 { 
-                    Console.Write("[E]");
+                    Console.Write("[E] ");
                 }
 
                 Console.Write($"{item.Name} | ");
@@ -468,17 +477,49 @@ namespace sparta_dungeon
             }
         }
 
-        public List<Item> itemlist()
+        public void SellingInventory()
         {
-            return itemList;
+            int i = 0;
+            foreach (Item item in inventoryList.Where(item => item.isBuy))
+            {
+                i++;
+                Console.WriteLine();
+                Console.Write("- ");
+                Console.Write(i + " ");
+
+                if (item.isEquiped)
+                {
+                    Console.Write("[E] ");
+                }
+
+                Console.Write($"{item.Name} | ");
+
+                if (item.Offense > 0)
+                {
+                    Console.Write($"공격력 +{item.Offense} ");
+                }
+                if (item.Defense > 0)
+                {
+                    Console.Write($"방어력 +{item.Defense} ");
+                }
+                Console.WriteLine($" | {item.Desc}");
+            }
         }
+
+        //public List<Item> itemlist()
+        //{
+        //    return inventoryList;
+        //}
 
         public void DisplayShop()
         {
-            foreach (Item item in itemList)
+            int i = 0;
+            foreach (Item item in shopItemList)
             {
+                i++;
+                Console.WriteLine();
                 Console.Write("- ");
-
+                Console.Write(i + " ");
                 Console.Write($"{item.Name} | ");
 
                 if (item.Offense > 0)
