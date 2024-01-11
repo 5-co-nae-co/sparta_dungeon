@@ -343,7 +343,8 @@ namespace sparta_dungeon
                     if (inputItem.isBuy)
                     {
                         inventory.inventoryList.Remove(inputItem);
-                        player.Gold += (inputItem.saleGold*100/85);
+                        player.Gold += (inputItem.saleGold*85/100);
+                        inputItem.isBuy = false;
                     }
                 }
                 ShopSell();
