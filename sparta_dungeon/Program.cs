@@ -371,11 +371,23 @@ namespace sparta_dungeon
                     Item inputItem = itemList[acton - 1];
                     if (inputItem.isBuy)
                     {
+                        if (inputItem == player.EquipedWeapon) //판매 전에 장비 상태 해체
+                        {
+                            player.isEquipedWeapon = false;
+                            player.EquipedWeapon = null;
+                        }
+                        else if (inputItem == player.EquipedArmor)
+                        {
+                            player.isEquipedArmor = false;
+                            player.EquipedArmor = null;
+                        }
+                        inputItem.isEquiped = false;
+                        inputItem.isBuy = false;
                         inventory.inventoryList.Remove(inputItem);
                         player.Gold += (inputItem.saleGold*85/100);
-                        inputItem.isBuy = false;
                     }
                 }
+                CalcAddedStat();
                 ShopSell();
             }
         }
