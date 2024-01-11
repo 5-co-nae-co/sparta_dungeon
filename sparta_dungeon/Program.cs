@@ -93,28 +93,28 @@ namespace sparta_dungeon
             } 
         }
         //반복적으로 State 진입시에 플레이어 스텟이 추가되지 않도록 추가해야함.
-        static void StateUpdate()
-        {
-            foreach (Item item in inventory.itemList)
-            {
-                if (!item.isEquiped)
-                {
-                    Console.WriteLine("변경사항 없음");
-                }
-                else if (item.isEquiped)                        // if 문으로 되어있어서 스탯창만 열어도 아이템의 능력치가 추가되는 현상 수정
-                {
-                    if (item.Offense != 0)
-                    {
-                        player.Offense += item.Offense;
-                    }
-                    if (item.Defense != 0)
-                    {
-                        player.Defence += item.Defense;
-                    }
-                    break;
-                }
-            }
-        }
+        //static void StateUpdate()
+        //{
+        //    foreach (Item item in inventory.itemList)
+        //    {
+        //        if (!item.isEquiped)
+        //        {
+        //            Console.WriteLine("변경사항 없음");
+        //        }
+        //        else if (item.isEquiped)                        // if 문으로 되어있어서 스탯창만 열어도 아이템의 능력치가 추가되는 현상 수정
+        //        {
+        //            if (item.Offense != 0)
+        //            {
+        //                player.Offense += item.Offense;
+        //            }
+        //            if (item.Defense != 0)
+        //            {
+        //                player.Defence += item.Defense;
+        //            }
+        //            break;
+        //        }
+        //    }
+        //}
         static void State()
         {
             //StateUpdate();
