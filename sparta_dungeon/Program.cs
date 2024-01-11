@@ -343,7 +343,7 @@ namespace sparta_dungeon
                     if (inputItem.isBuy)
                     {
                         inventory.inventoryList.Remove(inputItem);
-                        player.Gold += inputItem.saleGold;
+                        player.Gold += (inputItem.saleGold*100/85);
                     }
                 }
                 ShopSell();
@@ -444,10 +444,6 @@ namespace sparta_dungeon
             shopItemList.Add(item);
         }
 
-
-        
-        
-
         public void isEquipedInventory()
         {
             int i = 0;
@@ -503,13 +499,9 @@ namespace sparta_dungeon
                     Console.Write($"방어력 +{item.Defense} ");
                 }
                 Console.WriteLine($" | {item.Desc}");
+                Console.WriteLine($" | {item.saleGold * 0.85} G");
             }
         }
-
-        //public List<Item> itemlist()
-        //{
-        //    return inventoryList;
-        //}
 
         public void DisplayShop()
         {
