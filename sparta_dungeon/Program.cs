@@ -32,7 +32,21 @@ namespace sparta_dungeon
             settings();
             Start();
         }
-        
+        public static void CalcAddedStat() //추가 아이템 스텟을 체크하는 메서드
+        {
+            player.AddedOffense = 0;
+            player.AddedDefence = 0;
+
+            foreach (var item in inventory.inventoryList)
+            {
+                if (item.isEquiped)
+                {
+                    player.AddedOffense += item.Offense;
+                    player.AddedDefence += item.Defense;
+                }
+            }
+        }
+
         //min max까지 인풋 입력 가능 및 매개변수로 받은 인풋이 숫자인지 판단하는 메서드
         public static int CheckInput(int min, int max) 
         {
@@ -64,6 +78,7 @@ namespace sparta_dungeon
         }
         public static void Start()
         {
+            Console.Clear(); // 캐릭터 크리에이션 글 남는 것 지우기
             Console.WriteLine();
             Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
             Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.");
@@ -92,39 +107,16 @@ namespace sparta_dungeon
                 }
             } 
         }
-        //반복적으로 State 진입시에 플레이어 스텟이 추가되지 않도록 추가해야함.
-        //static void StateUpdate()
-        //{
-        //    foreach (Item item in inventory.itemList)
-        //    {
-        //        if (!item.isEquiped)
-        //        {
-        //            Console.WriteLine("변경사항 없음");
-        //        }
-        //        else if (item.isEquiped)                        // if 문으로 되어있어서 스탯창만 열어도 아이템의 능력치가 추가되는 현상 수정
-        //        {
-        //            if (item.Offense != 0)
-        //            {
-        //                player.Offense += item.Offense;
-        //            }
-        //            if (item.Defense != 0)
-        //            {
-        //                player.Defence += item.Defense;
-        //            }
-        //            break;
-        //        }
-        //    }
-        //}
+        
         static void State()
         {
-            //StateUpdate();
             Console.Clear();
             Console.WriteLine("상태 보기");
             Console.WriteLine("캐릭터의 정보가 표시됩니다.");
             Console.WriteLine($"Lv. {player.Lv}");
             Console.WriteLine($"{player.Name} ( {player.Job} )");        //"Chad > {player.Name}
-            Console.WriteLine($"공격력 : {player.Offense}");
-            Console.WriteLine($"방어력 : {player.Defence}");
+            Console.WriteLine($"공격력 : {player.Offense + player.AddedOffense}" + (player.AddedOffense == 0 ? "" : ($" ({ player.AddedOffense})")));
+            Console.WriteLine($"방어력 : {player.Defence + player.AddedDefence}" + (player.AddedDefence == 0 ? "" : ($" ({player.AddedDefence})")));
             Console.WriteLine($"체력 : {player.Hp}");
             Console.WriteLine($"Gold : {player.Gold}");
             Console.WriteLine();
@@ -196,7 +188,7 @@ namespace sparta_dungeon
             Console.WriteLine(">>");
 
             List<Item> itemList = inventory.inventoryList;
-            int acton = CheckInput(0, 4);
+            int acton = CheckInput(0, inventory.inventoryList.Count);
             while(true)
             {
                 if (acton == 0)
@@ -206,17 +198,49 @@ namespace sparta_dungeon
                 }
                 else if (acton <= itemList.Count)
                 {
+                    //NOTE 현재 공격력 방어력으로 구분되는 아이템 클래스가 이후 아이템 추가로
+                    //공격력 방어력 두가지 스탯을 동시에 가진 아이템이 나오게 되면 문제가 생김
                     Item inputItem = itemList[acton - 1];
-                    player.EquipWeapon(inputItem);
-                    if (!inputItem.isEquiped)
+                    if (inputItem.Offense > 0) //장착 대상이 무기일 때
                     {
-                        inputItem.isEquiped = true;
+                        if (player.EquipedWeapon == inputItem)
+                        {
+                            inputItem.isEquiped = false;
+                        }
+                        else if (player.isEquipedWeapon) //이미 장착 중인 무기가 있을 때 해제 후 장착
+                        {
+                            player.EquipedWeapon.isEquiped = false;
+                            player.EquipedWeapon = null;
+                            player.isEquipedWeapon = false;
+                            inputItem.isEquiped = true;
+                        }
+                        else if (!player.isEquipedWeapon) //장착 중인 무기가 없을 때 장착
+                        {
+                            inputItem.isEquiped = true;
+                        }
+                        player.EquipWeapon(inputItem);
                     }
-                    else
+                    else if (inputItem.Defense > 0) //장착 대상이 방어구일 때
                     {
-                        inputItem.isEquiped = false;
+                        if (player.EquipedArmor == inputItem) //장착 중인 방어구 해제
+                        {
+                            inputItem.isEquiped = false;
+                        }
+                        else if (player.isEquipedArmor) //이미 장착 중인 방어구가 있을 때 해제 후 장착
+                        {
+                            player.EquipedArmor.isEquiped = false;
+                            player.EquipedArmor = null;
+                            player.isEquipedArmor = false;
+                            inputItem.isEquiped = true;
+                        }
+                        else if (!player.isEquipedArmor) //장착 중인 방어구가 없을 때 장착
+                        {
+                            inputItem.isEquiped = true;
+                        }
+                        player.EquipArmor(inputItem);
                     }
                 }
+                CalcAddedStat();
                 isEquipedInventory();
             }
         }
@@ -366,6 +390,8 @@ namespace sparta_dungeon
         public int Defence;
         public int Hp;
         public int Gold;
+        public int AddedOffense; //아이템 추가 공격력
+        public int AddedDefence; //아이템 추가 방어력
 
         public Item EquipedWeapon;
         public Item EquipedArmor;
