@@ -586,7 +586,15 @@ namespace sparta_dungeon
                 {
                     Console.Write($"방어력 +{item.Defense} ");
                 }
-                Console.WriteLine($" | {item.Desc}");
+                Console.Write($" | {item.Desc}  |");
+                if (item.ItemType == 0)
+                {
+                    Console.Write(" 공용");
+                }
+                else if (item.ItemType == 1)
+                {
+                    Console.Write(" 전사용");
+                }
 
                 //이미 구매 했을때
                 if (item.isBuy)
