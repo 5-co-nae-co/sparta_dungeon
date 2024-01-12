@@ -16,20 +16,48 @@ namespace sparta_dungeon
             player.SelectName(player);                            //플레이어 이름 설정
             player.SelectJob(player);                             //플레이어 직업 선택                        
 
-            Item ChainArmor = new Item("무쇠 갑옷", 0, 10, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 300);
-            inventory.Add(ChainArmor);
+            //무기
+            Item Keyboard = new Item("키보드", 5, 0, "분노로 휘두르면 생각보다 강한 타격을 줍니다만 무기는 아닙니다.", false, false, 100);
+            inventory.Add(Keyboard);
             Item OldSword = new Item("낡은 검", 10, 0, "쉽게 볼 수 있는 낡은 검 입니다", false, false, 400);
             inventory.Add(OldSword);
-            Item SpartaSpear = new Item("스파르타 창", 15, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 500);
+            Item BronzeAxe = new Item("청동 도끼", 15, 0, "어디선가 사용됐던거 같은 도끼입니다.", false, false, 600);
+            inventory.Add(BronzeAxe);
+            Item SpartaSpear = new Item("스파르타 창", 30, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 3000);
             inventory.Add(SpartaSpear);
-            Item SpartaArmor = new Item("스파르타 갑옷", 0, 20, "스파르타 전사들이 입던 갑옷입니다.", false, false, 3000);
+
+            //방어구
+            Item BeggarsCloth = new Item("거렁뱅이의 옷", 0, 5, "촌장의 마음보다 넓은 구멍이 뚫려있는 더러운 옷입니다.", false, false, 100);
+            inventory.Add(BeggarsCloth);
+            Item TrainingArmor = new Item("수련자갑옷", 0, 10, "수련에 도움을 주는 헐렁한 갑옷입니다.", false, false, 400);
+            inventory.Add(TrainingArmor);
+            Item IronArmor = new Item("무쇠 갑옷", 0, 15, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 600);
+            inventory.Add(IronArmor);
+            Item SpartaArmor = new Item("스파르타 갑옷", 0, 30, "스파르타 전사들이 입던 갑옷입니다.", false, false, 3000);
             inventory.Add(SpartaArmor);
         }
-
-
+        //텍스트 컬러 변경 메소드
+        public static void ColorText(string text, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.Write(text);
+            Console.ResetColor();
+        }
+        //천천히 프린트 되는 텍스트 메소드
+        public static void SlowText(string msg, int delay)
+        {
+            foreach (char c in msg.ToCharArray())
+            {
+                Console.Write(c);
+                Thread.Sleep(delay);
+            }
+            Console.WriteLine();
+        }
         public static void Main()
         {
+            Console.SetWindowSize(105, 43);//시작 화면 크기 고정 코드
             settings();
+            Intro(); //Note 테스트 할 때에는 오래걸리니 주석화 한 뒤 진행하세요.
             Start();
         }
         public static void CalcAddedStat() //추가 아이템 스텟을 체크하는 메서드
@@ -52,9 +80,7 @@ namespace sparta_dungeon
         {
             static void WrongInput()
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("잘못된 입력입니다!");
-                Console.ResetColor();
+                ColorText("잘못된 입력입니다!",ConsoleColor.Red);
             }
             var top = Console.CursorTop;
 
@@ -78,13 +104,31 @@ namespace sparta_dungeon
         }
         public static void Start()
         {
+            string title = @"+================================================================+ 
+||  _____             _          ___                            ||
+|| |   __|___ ___ ___| |_ ___   |    ＼ _ _ ___ ___ ___ ___ ___ ||
+|| |__   | . | .'|  _|  _| .'|  |  |  | | |   | . | -_| . |   | ||
+|| |_____|  _|__,|_| |_| |__,|  |____/|___|_|_|_  |___|___|_|_| ||
+||       |_|                                  |___|             ||
+||                                                              ||
++================================================================+ ";
             Console.Clear(); // 캐릭터 크리에이션 글 남는 것 지우기
             Console.WriteLine();
-            Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
+            ColorText(title, ConsoleColor.Yellow);
+            Console.WriteLine();
+            Console.WriteLine();
+            ColorText("스파르타 던전에 오신 여러분 환영합니다.", ConsoleColor.Cyan);
+            Console.WriteLine();
+            Console.WriteLine();
             Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine();
             Console.WriteLine("1. 상태 보기");
             Console.WriteLine("2. 인벤토리");
             Console.WriteLine("3. 상점");
+            Console.ResetColor();
+            Console.WriteLine();
+            Console.WriteLine("-----------------------------------------------------------------------");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
             int acton = CheckInput(1, 3);
@@ -102,6 +146,14 @@ namespace sparta_dungeon
                 }
                 else if (acton == 3)
                 {
+                    Console.Clear();
+                    Console.WriteLine();
+                    Console.WriteLine("당신은 상점에 도착하셨습니다.");
+                    Console.WriteLine();
+                    Program.ColorText("문영오 매니저(상점주인): ", ConsoleColor.DarkCyan);
+                    Program.SlowText("어서오시게나 젊은 르탄이. 무엇을 사고 싶으신가? 팔 것이라도?", 30);
+                    Thread.Sleep(800);
+                    Console.WriteLine();
                     Shop();
                     break;
                 }
@@ -111,17 +163,33 @@ namespace sparta_dungeon
         static void State()
         {
             Console.Clear();
-            Console.WriteLine("상태 보기");
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("+===========+");
+            Console.WriteLine("||상태 보기||");
+            Console.WriteLine("+===========+");
+            Console.ResetColor();
+            Console.WriteLine();
             Console.WriteLine("캐릭터의 정보가 표시됩니다.");
-            Console.WriteLine($"Lv. {player.Lv}");
-            Console.WriteLine($"{player.Name} ( {player.Job} )");        //"Chad > {player.Name}
+            Console.WriteLine();
+            ColorText($"Lv. {player.Lv} ", ConsoleColor.Red);
+            ColorText($"{player.Name} ( {player.Job} )", ConsoleColor.Yellow);        //"Chad > {player.Name}
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.ForegroundColor= ConsoleColor.Green;
             Console.WriteLine($"공격력 : {player.Offense + player.AddedOffense}" + (player.AddedOffense == 0 ? "" : ($" (+{ player.AddedOffense})")));
             Console.WriteLine($"방어력 : {player.Defence + player.AddedDefence}" + (player.AddedDefence == 0 ? "" : ($" (+{player.AddedDefence})")));
-            Console.WriteLine($"체력 : {player.Hp}");
-            Console.WriteLine($"Gold : {player.Gold}");
+            Console.ResetColor();
+            ColorText($"체력 : {player.Hp}", ConsoleColor.DarkGreen);
             Console.WriteLine();
-            Console.WriteLine("0. 나가기");
             Console.WriteLine();
+            ColorText($"Gold : {player.Gold}", ConsoleColor.DarkYellow);
+            Console.WriteLine();
+            Console.WriteLine();
+            ColorText("0. 나가기", ConsoleColor.Yellow);
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("-----------------------------------------------------------------------");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
 
@@ -139,18 +207,30 @@ namespace sparta_dungeon
 
         static void Inventory()
         {
+            string inventorytitle = @"  ___                      _                   
+ |_ _|_ ____   _____ _ __ | |_ ___  _ __ _   _ 
+  | || '_ \ \ / / _ | '_ \| __/ _ \| '__| | | |
+  | || | | \ V |  __| | | | || (_) | |  | |_| |
+ |___|_| |_|\_/ \___|_| |_|\__\___/|_|   \__, |
+                                         |___/ ";
             Console.Clear();
-            Console.WriteLine("인벤토리");
+            ColorText(inventorytitle, ConsoleColor.Yellow);
+            Console.WriteLine();
             Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.");
             Console.WriteLine();
-            Console.WriteLine("[아이템 목록]");
+            ColorText("[아이템 목록]", ConsoleColor.Cyan);
+            Console.WriteLine();
+            Console.WriteLine();
 
             inventory.isEquipedInventory();
 
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
             Console.WriteLine("1. 장착 관리");
             Console.WriteLine();
+            Console.ResetColor();
+            Console.WriteLine("-----------------------------------------------------------------------");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
 
@@ -174,16 +254,28 @@ namespace sparta_dungeon
         public static void isEquipedInventory()
         {
             Console.Clear();
-            Console.WriteLine("인벤토리 - 장착 관리");
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("+======================+");
+            Console.WriteLine("||인벤토리 - 장착 관리||");
+            Console.WriteLine("+======================+");
+            Console.WriteLine();
+            Console.ResetColor();
+
             Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.");
             Console.WriteLine();
-            Console.WriteLine("[보유 중인 아이템 목록]");
+            ColorText("[보유 중인 아이템 목록]", ConsoleColor.Cyan);
+            Console.WriteLine();
+            Console.WriteLine();
 
             inventory.isEquipedInventory();
 
             Console.WriteLine();
-            Console.WriteLine("0. 나가기");
+            ColorText("0. 나가기", ConsoleColor.Yellow);
             Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("-----------------------------------------------------------------------");
             Console.WriteLine("장착을 원하시는 아이템의 번호를 입력해주세요.");
             Console.WriteLine(">>");
 
@@ -247,15 +339,26 @@ namespace sparta_dungeon
 
         static void ShopInterface()
         {
-            Console.WriteLine("상점");
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("+======+");
+            Console.WriteLine("||상점||");
+            Console.WriteLine("+======+");
+            Console.ResetColor();
+            Console.WriteLine();
+
             Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
+            Console.WriteLine();
 
             Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("[보유 골드]");
             Console.WriteLine($"{player.Gold} G");
+            Console.ResetColor();
 
             Console.WriteLine();
-            Console.WriteLine("[모든 아이템 목록]");
+            Program.ColorText("[모든 아이템 목록]", ConsoleColor.Cyan);
+            Console.WriteLine();
+            Console.WriteLine();
         }
         static void Shop()
         {
@@ -263,11 +366,14 @@ namespace sparta_dungeon
             ShopInterface();
             inventory.DisplayShop();
 
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
             Console.WriteLine("1. 아이템 구매");
             Console.WriteLine("2. 아이템 판매");
+            Console.ResetColor();
             Console.WriteLine();
+            Console.WriteLine("-----------------------------------------------------------------------");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
 
@@ -300,8 +406,10 @@ namespace sparta_dungeon
             inventory.DisplayShop();
 
             Console.WriteLine();
-            Console.WriteLine("0. 나가기");
+            ColorText("0. 나가기", ConsoleColor.Yellow);
             Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("-----------------------------------------------------------------------");
             Console.WriteLine("구매를 원하시는 아이템의 번호를 입력해주세요.");
             Console.WriteLine(">>");
 
@@ -353,6 +461,7 @@ namespace sparta_dungeon
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
             Console.WriteLine();
+            Console.WriteLine("-----------------------------------------------------------------------");
             Console.WriteLine("판매를 원하시는 아이템의 번호를 입력해주세요.");
             Console.WriteLine(">>");
 
@@ -391,6 +500,43 @@ namespace sparta_dungeon
                 ShopSell();
             }
         }
+        public static void Intro()
+        {
+            Console.Clear();
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            SlowText("이곳은 내일배움캠프 왕국.", 50);
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine();
+            SlowText($"당신의 이름은 {player.Name}. 직업은 {player.Job}입니다.", 40);
+            Console.WriteLine();
+            SlowText("오랜 모험 끝에 스파르타 코딩 마을에 도착하셨습니다.", 50);
+            SlowText("이곳은 많은 초보 코딩 모험가들이 ",30);
+            Console.WriteLine();
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.SetCursorPosition(2, Console.CursorTop);
+            Console.WriteLine("==========");
+            Console.SetCursorPosition(2, Console.CursorTop);
+            SlowText("|| 회사 ||", 100);
+            Console.SetCursorPosition(2, Console.CursorTop);
+            Console.WriteLine("==========");
+            Console.WriteLine();
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            SlowText("라는 무시무시한 던전을 목표로 수련을 위해 거쳐가는 마을이기에", 30);
+            SlowText("밝은 미래를 꿈꾸는 다양한 모험가들이 이곳에서 준비를 마치고 갑니다.", 30);
+            Console.WriteLine();
+            Thread.Sleep(400);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            SlowText("현 마을의 촌장은 절대적인 지지를 자랑하는 한효승(내배캠 매니저)씨 입니다.", 50);
+            Console.WriteLine();
+            Console.ResetColor();
+            Console.WriteLine();
+            Thread.Sleep(600);
+            Console.Write("게임에 입장하는 중 입니다"); //로딩 흉내내기
+            SlowText(" . . . . . ", 150);
+        }
     }
     
     class Character
@@ -425,14 +571,30 @@ namespace sparta_dungeon
         {
             bool isCorrectName = false;
             int selectNum = 0;
-
+            string CharacterTitle = @"   ____ _                          _                                  _   _             
+  / ___| |__   __ _ _ __ __ _  ___| |_ ___ _ __    ___ _ __ ___  __ _| |_(_) ___  _ __  
+ | |   | '_ \ / _` | '__/ _` |/ __| __/ _ | '__|  / __| '__/ _ \/ _` | __| |/ _ \| '_ \ 
+ | |___| | | | (_| | | | (_| | (__| ||  __| |    | (__| | |  __| (_| | |_| | (_) | | | |
+  \____|_| |_|\__,_|_|  \__,_|\___|\__\___|_|     \___|_|  \___|\__,_|\__|_|\___/|_| |_|
+                                                                                        ";
             while (isCorrectName == false)
             {
+                Console.Clear();
+                Program.ColorText(CharacterTitle, ConsoleColor.Yellow);
+                Console.WriteLine();
                 Console.WriteLine("플레이어의 이름을 입력해주세요.");
+                Console.WriteLine();
                 string playerName = Console.ReadLine();
                 isCorrectName = true;
-                Console.WriteLine($"선택하신 이름은 {playerName}입니다.");
-                Console.WriteLine("1. 네  2. 아니오");
+                Console.WriteLine();
+                Console.Write("선택하신 이름은 ");
+                Program.ColorText(playerName, ConsoleColor.Cyan);
+                Console.WriteLine(" 입니다.");
+                Console.WriteLine();
+                Program.ColorText("1. 네  ", ConsoleColor.Yellow);
+                Program.ColorText("2. 아니오", ConsoleColor.DarkYellow);
+                Console.WriteLine();
+                Console.WriteLine();
                 int acton = Program.CheckInput(1, 2);
 
                 if (acton == 1)
@@ -450,11 +612,26 @@ namespace sparta_dungeon
         public void SelectJob(Character character)         // 직업 선택화면
         {
             bool isCorrectNum = false;
+            string ClassTitle = @"   ____ _                          _           _   _             
+  / ___| | __ _ ___ ___   ___  ___| | ___  ___| |_(_) ___  _ __  
+ | |   | |/ _` / __/ __| / __|/ _ | |/ _ \/ __| __| |/ _ \| '_ \ 
+ | |___| | (_| \__ \__ \ \__ |  __| |  __| (__| |_| | (_) | | | |
+  \____|_|\__,_|___|___/ |___/\___|_|\___|\___|\__|_|\___/|_| |_|";
             
+            Console.Clear();
+            Console.WriteLine();
+            Program.ColorText(ClassTitle, ConsoleColor.Yellow);
+            Console.WriteLine();
+            Console.WriteLine();
             Console.WriteLine("직업을 선택해주세요.");
-            Console.WriteLine("1. 전사  2. 도적 3. 궁수");
+            Console.WriteLine();
+            Program.ColorText("1. 전사  ", ConsoleColor.Cyan);
+            Program.ColorText("2. 도적  ", ConsoleColor.DarkCyan);
+            Program.ColorText("3. 궁수", ConsoleColor.Blue);
+            Console.WriteLine();
+            Console.WriteLine();
 
-            while(isCorrectNum == false)
+            while (isCorrectNum == false)
             {
                 isCorrectNum = true;
                 int acton = Program.CheckInput(1, 3);
@@ -561,26 +738,28 @@ namespace sparta_dungeon
             foreach (Item item in inventoryList.Where(item => item.isBuy))
             {
                 i++;
-                Console.WriteLine();
                 Console.Write("- ");
-                Console.Write(i + " ");
+                Console.Write(i);
 
                 if (item.isEquiped) 
-                { 
-                    Console.Write("[E] ");
+                {
+                    Program.ColorText(" [E]", ConsoleColor.Red);
                 }
 
-                Console.Write($"{item.Name} | ");
+                Program.ColorText($" {item.Name}", ConsoleColor.Cyan);
+                Console.Write(" | ");
 
                 if (item.Offense > 0) 
                 { 
-                    Console.Write($"공격력 +{item.Offense} "); 
+                    Program.ColorText($"공격력 +{item.Offense} ", ConsoleColor.Green); 
                 }
                 if (item.Defense > 0) 
                 { 
-                    Console.Write($"방어력 +{item.Defense} "); 
+                    Program.ColorText($"방어력 +{item.Defense} ", ConsoleColor.Green); 
                 }
-                Console.WriteLine($" | {item.Desc}");
+                Console.Write(" | ");
+                Program.ColorText($"{item.Desc}", ConsoleColor.White);
+                Console.WriteLine();
             }
         }
 
@@ -590,27 +769,30 @@ namespace sparta_dungeon
             foreach (Item item in inventoryList.Where(item => item.isBuy))
             {
                 i++;
-                Console.WriteLine();
                 Console.Write("- ");
-                Console.Write(i + " ");
+                Console.Write(i);
 
                 if (item.isEquiped)
                 {
-                    Console.Write("[E] ");
+                    Program.ColorText(" [E]", ConsoleColor.Red);
                 }
 
-                Console.Write($"{item.Name} | ");
+                Program.ColorText($" {item.Name}", ConsoleColor.Cyan);
+                Console.Write(" | ");
 
                 if (item.Offense > 0)
                 {
-                    Console.Write($"공격력 +{item.Offense} ");
+                    Program.ColorText($"공격력 +{item.Offense} ", ConsoleColor.DarkGreen);
                 }
                 if (item.Defense > 0)
                 {
-                    Console.Write($"방어력 +{item.Defense} ");
+                    Program.ColorText($"방어력 +{item.Defense} ", ConsoleColor.DarkGreen);
                 }
-                Console.WriteLine($" | {item.Desc}");
-                Console.WriteLine($" | {item.saleGold * 0.85} G");
+                Console.Write(" | ");
+                Program.ColorText($"{item.Desc}", ConsoleColor.White);
+                Console.WriteLine();
+                Program.ColorText($" | {item.saleGold * 0.85} G", ConsoleColor.Green);
+                Console.WriteLine();
             }
         }
 
@@ -620,29 +802,33 @@ namespace sparta_dungeon
             foreach (Item item in shopItemList)
             {
                 i++;
-                Console.WriteLine();
                 Console.Write("- ");
-                Console.Write(i + " ");
-                Console.Write($"{item.Name} | ");
+                Console.Write(i);
+                Program.ColorText($" {item.Name}", ConsoleColor.Cyan);
+                Console.Write(" | ");
 
                 if (item.Offense > 0)
                 {
-                    Console.Write($"공격력 +{item.Offense} ");
+                    Program.ColorText($"공격력 +{item.Offense} ", ConsoleColor.Green);
                 }
                 if (item.Defense > 0)
                 {
-                    Console.Write($"방어력 +{item.Defense} ");
+                    Program.ColorText($"방어력 +{item.Defense} ", ConsoleColor.Green);
                 }
-                Console.WriteLine($" | {item.Desc}");
-                
+                Console.Write(" | ");
+                Program.ColorText($"{item.Desc}", ConsoleColor.White);
+                Console.WriteLine();
+
                 //이미 구매 했을때
                 if (item.isBuy) 
                 { 
-                    Console.WriteLine($" | 구매완료"); 
+                    Program.ColorText($" | 구매완료", ConsoleColor.Red);
+                    Console.WriteLine();
                 }
                 else 
-                { 
-                    Console.WriteLine($" | {item.saleGold} G"); 
+                {
+                    Program.ColorText($" | {item.saleGold} G", ConsoleColor.Yellow);
+                    Console.WriteLine();
                 }
             }
         }
