@@ -3,6 +3,7 @@ using System.IO.Pipes;
 using System.Net.Security;
 using System.Numerics;
 using System.Xml.Linq;
+using System;
 
 namespace sparta_dungeon
 {
@@ -659,16 +660,22 @@ namespace sparta_dungeon
 
             this.player = player;
             monsters = new List<Monster>();
+
         }
-        public void BattleStart()
+        public void monsterRewpawn()
         {
             monsters.Clear();
             Monster minion = new Monster("미니언", 2, 15, 10, 0, "나약한 미니언이다.");
-            monsters.Add(minion);
             Monster voidinsect = new Monster("공허충", 3, 20, 15, 1, "공허충입니다.");
-            monsters.Add(voidinsect);
             Monster cannonminion = new Monster("대포미니언", 4, 30, 20, 3, "대포미니언입니다.");
+            monsters.Add(voidinsect);
+            monsters.Add(minion);
             monsters.Add(cannonminion);
+            monsters = monsters.OrderBy(monster => random.Next(-1, 1)).ToList();
+        }
+        public void BattleStart()
+        {
+            monsterRewpawn();
             int max_hp = player.Hp;
             while (player.Hp > 0 && player.Hp > 0 && monsters.Any(m => m.Hp > 0))
             {
@@ -686,7 +693,7 @@ namespace sparta_dungeon
                 Console.WriteLine();
                 Console.WriteLine($"[내정보]\n" +
                     $"Lv.{player.Lv} {player.Name} ({player.Job})\n" +
-                    $"HP {player.Hp}/100\n");
+                    $"HP {player.Hp}/{max_hp}\n");
 
 
                 Console.WriteLine("1. 공격\n");
@@ -700,7 +707,7 @@ namespace sparta_dungeon
                 {
                     if (acton == 1)
                     {
-                        playerAttack();
+                        playerAttack(max_hp);
                         break;
                     }
                 }
@@ -717,9 +724,9 @@ namespace sparta_dungeon
                     Console.WriteLine("Battle!!\n");
                 }
             }
-            Result();
+            Result(max_hp);
         }
-        public void playerAttack()
+        public void playerAttack(int max_hp)
         {
             Console.Clear();
             for (int i = 0; i < monsters.Count; i++)
@@ -787,7 +794,7 @@ namespace sparta_dungeon
             Console.WriteLine("엔터를 입력하세요");
             Console.ReadLine();
         }
-        public void Result()
+        public void Result(int max_hp)
         {
             Console.Clear();
             Console.WriteLine("Battle!! - Result\n");
