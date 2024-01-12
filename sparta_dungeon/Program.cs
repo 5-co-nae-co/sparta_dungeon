@@ -17,14 +17,14 @@ namespace sparta_dungeon
             player.SelectName(player);                            //플레이어 이름 설정
             player.SelectJob(player);                             //플레이어 직업 선택                        
 
-            Item ChainArmor = new Item("무쇠 갑옷", 0, 10, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 300);
+            Item ChainArmor = new Item("무쇠 갑옷", 0, 10, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 300,0);
             inventory.Add(ChainArmor);
-            Item OldSword = new Item("낡은 검", 10, 0, "낡은 검", false, false, 400);
-            inventory.Add(OldSword);
-            Item SpartaSpear = new Item("스파르타 창", 15, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 500);
-            inventory.Add(SpartaSpear);
-            Item SpartaArmor = new Item("스파르타 갑옷", 0, 20, "스파르타 전사들이 입던 갑옷입니다.", false, false, 3000);
+            Item SpartaArmor = new Item("스파르타 갑옷", 0, 20, "스파르타 전사들이 입던 갑옷입니다.", false, false, 3000, 1);
             inventory.Add(SpartaArmor);
+            Item OldSword = new Item("낡은 검", 10, 0, "낡은 검", false, false, 400,0);
+            inventory.Add(OldSword);
+            Item SpartaSpear = new Item("스파르타 창", 15, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 500,1);
+            inventory.Add(SpartaSpear);
         }
 
         public static void Main()
@@ -487,8 +487,9 @@ namespace sparta_dungeon
         public bool isEquiped;
         public bool isBuy;
         public int saleGold;
+        public int ItemType; // 공용 아이템은 0, 전사는 1, 도적은 2, 궁수는 3
 
-        public Item (string name, int offense, int defense, string desc, bool isequiped, bool isbuy, int salegold)
+        public Item (string name, int offense, int defense, string desc, bool isequiped, bool isbuy, int salegold, int itemType)
         {
             Name = name;
             Offense = offense;
@@ -497,30 +498,31 @@ namespace sparta_dungeon
             isEquiped = isequiped;
             isBuy = isbuy;
             saleGold = salegold;
+            ItemType = itemType;
         }
     }
 
-    public class Weapon : Item
-    {
-        public int WeaponType;
+    //public class Weapon : Item
+    //{
+    //    public  int WeaponType;  // 공용 아이템은 0, 전사는 1, 도적은 2, 궁수는 3
 
-        public Weapon(string name, int offense, int defense, string desc, bool isequiped, bool isbuy, int salegold, int weaponType)
-            : base(name, offense, defense, desc, isequiped, isbuy, salegold)
-        {
-            WeaponType = weaponType;
-        }
-    }
+    //    public Weapon(string name, int offense, int defense, string desc, bool isequiped, bool isbuy, int salegold, int weaponType)
+    //        : base(name, offense, defense, desc, isequiped, isbuy, salegold)
+    //    {
+    //        WeaponType = weaponType;
+    //    }
+    //}
 
-    public class Armor : Item
-    {
-        public int ArmorType;
+    //public class Armor : Item
+    //{
+    //    public  int ArmorType;  //공용 아이템은 0, 전사는 1, 도적은 2, 궁수는 3
 
-        public Armor(string name, int offense, int defense, string desc, bool isequiped, bool isbuy, int salegold, int armorType)
-            : base(name, offense, defense, desc, isequiped, isbuy, salegold)
-        {
-            ArmorType = armorType;
-        }
-    }
+    //    public Armor(string name, int offense, int defense, string desc, bool isequiped, bool isbuy, int salegold, int armorType)
+    //        : base(name, offense, defense, desc, isequiped, isbuy, salegold)
+    //    {
+    //        ArmorType = armorType;
+    //    }
+    //}
     public class Inventory
     {
         public List<Item> itemList;
@@ -566,10 +568,14 @@ namespace sparta_dungeon
 
         public void DisplayShop()
         {
+            int i = 0;
+
             foreach (Item item in itemList)
             {
+                i++;
+                Console.WriteLine();
                 Console.Write("- ");
-
+                Console.Write(i + " ");
                 Console.Write($"{item.Name} | ");
 
                 if (item.Offense > 0)
@@ -581,15 +587,15 @@ namespace sparta_dungeon
                     Console.Write($"방어력 +{item.Defense} ");
                 }
                 Console.WriteLine($" | {item.Desc}");
-                
+
                 //이미 구매 했을때
-                if (item.isBuy) 
-                { 
-                    Console.WriteLine($" | 구매완료"); 
+                if (item.isBuy)
+                {
+                    Console.WriteLine($" | 구매완료");
                 }
-                else 
-                { 
-                    Console.WriteLine($" | {item.saleGold} G"); 
+                else
+                {
+                    Console.WriteLine($" | {item.saleGold} G");
                 }
             }
         }
