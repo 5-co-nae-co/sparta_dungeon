@@ -6,6 +6,7 @@ using System.Xml.Linq;
 
 namespace sparta_dungeon
 {
+
     internal class Program
     {
         static Character player;
@@ -18,14 +19,13 @@ namespace sparta_dungeon
 
             Item ChainArmor = new Item("무쇠 갑옷", 0, 10, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 300);
             inventory.Add(ChainArmor);
-            Item OldSword = new Item("낡은 검", 10, 0, "쉽게 볼 수 있는 낡은 검 입니다", false, false, 400);
+            Item OldSword = new Item("낡은 검", 10, 0, "낡은 검", false, false, 400);
             inventory.Add(OldSword);
             Item SpartaSpear = new Item("스파르타 창", 15, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 500);
             inventory.Add(SpartaSpear);
             Item SpartaArmor = new Item("스파르타 갑옷", 0, 20, "스파르타 전사들이 입던 갑옷입니다.", false, false, 3000);
             inventory.Add(SpartaArmor);
         }
-
 
         public static void Main()
         {
@@ -62,7 +62,7 @@ namespace sparta_dungeon
                 Console.SetCursorPosition(0, top);
             }
         }
-        public static void Start()
+        static void Start()
         {
             Console.WriteLine();
             Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
@@ -93,28 +93,28 @@ namespace sparta_dungeon
             } 
         }
         //반복적으로 State 진입시에 플레이어 스텟이 추가되지 않도록 추가해야함.
-        //static void StateUpdate()
-        //{
-        //    foreach (Item item in inventory.itemList)
-        //    {
-        //        if (!item.isEquiped)
-        //        {
-        //            Console.WriteLine("변경사항 없음");
-        //        }
-        //        else if (item.isEquiped)                        // if 문으로 되어있어서 스탯창만 열어도 아이템의 능력치가 추가되는 현상 수정
-        //        {
-        //            if (item.Offense != 0)
-        //            {
-        //                player.Offense += item.Offense;
-        //            }
-        //            if (item.Defense != 0)
-        //            {
-        //                player.Defence += item.Defense;
-        //            }
-        //            break;
-        //        }
-        //    }
-        //}
+        static void StateUpdate()
+        {
+            foreach (Item item in inventory.itemList)
+            {
+                if (!item.isEquiped)
+                {
+                    Console.WriteLine("변경사항 없음");
+                }
+                else if (item.isEquiped)         // if 문으로 되어있어서 캐릭터 생성 후 스탯창만 열어도 아이템의 능력치가 추가되는 현상 문제가 완전히 해결된 것은 아님!!
+                {
+                    if (item.Offense != 0)
+                    {
+                        player.Offense += item.Offense;
+                    }
+                    if (item.Defense != 0)
+                    {
+                        player.Defence += item.Defense;
+                    }
+                    break;
+                }
+            }
+        }
         static void State()
         {
             //StateUpdate();
@@ -162,7 +162,7 @@ namespace sparta_dungeon
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
 
-            List<Item> itemList = inventory.inventoryList;
+            List<Item> itemList = inventory.itemList;
             int acton = CheckInput(0, 1);
             while(true)
             {
@@ -179,7 +179,7 @@ namespace sparta_dungeon
             }
         }
 
-        public static void isEquipedInventory()
+        static void isEquipedInventory()
         {
             Console.Clear();
             Console.WriteLine("인벤토리 - 장착 관리");
@@ -192,10 +192,10 @@ namespace sparta_dungeon
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
             Console.WriteLine();
-            Console.WriteLine("장착을 원하시는 아이템의 번호를 입력해주세요.");
+            Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
 
-            List<Item> itemList = inventory.inventoryList;
+            List<Item> itemList = inventory.itemList;
             int acton = CheckInput(0, 4);
             while(true)
             {
@@ -204,7 +204,7 @@ namespace sparta_dungeon
                     Inventory();
                     break;
                 }
-                else if (acton <= itemList.Count)
+                else if (acton == 1 || acton == 2 || acton == 3|| acton == 4)
                 {
                     Item inputItem = itemList[acton - 1];
                     player.EquipWeapon(inputItem);
@@ -232,12 +232,13 @@ namespace sparta_dungeon
 
             Console.WriteLine();
             Console.WriteLine("[모든 아이템 목록]");
+
+            inventory.DisplayShop();
         }
         static void Shop()
         {
             Console.Clear();
             ShopInterface();
-            inventory.DisplayShop();
 
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
@@ -273,7 +274,6 @@ namespace sparta_dungeon
         {
             Console.Clear();
             ShopInterface();
-            inventory.DisplayShop();
 
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
@@ -281,8 +281,8 @@ namespace sparta_dungeon
             Console.WriteLine("구매를 원하시는 아이템의 번호를 입력해주세요.");
             Console.WriteLine(">>");
 
-            List<Item> itemList = inventory.shopItemList;
-            int acton = CheckInput(0, itemList.Count);
+            List<Item> itemList = inventory.itemlist();
+            int acton = CheckInput(0, 4);
             while(true)
             {
                 if (acton == 0)
@@ -291,7 +291,7 @@ namespace sparta_dungeon
                     break;
                 }
                 
-                else if (acton <= itemList.Count)
+                else if (acton == 1 || acton == 2 || acton == 3 || acton == 4)
                 {
                     Item inputItem = itemList[acton - 1];
                     if (inputItem.isBuy)
@@ -304,9 +304,8 @@ namespace sparta_dungeon
                     }
                     else if (inputItem.saleGold <= player.Gold)
                     {
-                        inventory.inventoryList.Add(inputItem);
-                        player.Gold -= inputItem.saleGold;
                         inputItem.isBuy = true;
+                        player.Gold -= inputItem.saleGold;
                     }
                     else
                     {
@@ -324,7 +323,6 @@ namespace sparta_dungeon
         {
             Console.Clear();
             ShopInterface();
-            inventory.SellingInventory(); ;
 
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
@@ -332,8 +330,8 @@ namespace sparta_dungeon
             Console.WriteLine("판매를 원하시는 아이템의 번호를 입력해주세요.");
             Console.WriteLine(">>");
 
-            List<Item> itemList = inventory.inventoryList;
-            int acton = CheckInput(0, itemList.Count);
+            List<Item> itemList = inventory.itemlist();
+            int acton = CheckInput(0, 4);
             while(true)
             {
                 if (acton == 0)
@@ -342,14 +340,13 @@ namespace sparta_dungeon
                     break;
                 }
 
-                else if (acton <= itemList.Count)
+                else if (acton == 1 || acton == 2 || acton == 3 || acton == 4)
                 {
                     Item inputItem = itemList[acton - 1];
                     if (inputItem.isBuy)
                     {
-                        inventory.inventoryList.Remove(inputItem);
-                        player.Gold += (inputItem.saleGold*85/100);
                         inputItem.isBuy = false;
+                        player.Gold += inputItem.saleGold;
                     }
                 }
                 ShopSell();
@@ -502,34 +499,50 @@ namespace sparta_dungeon
             saleGold = salegold;
         }
     }
+
+    public class Weapon : Item
+    {
+        public int WeaponType;
+
+        public Weapon(string name, int offense, int defense, string desc, bool isequiped, bool isbuy, int salegold, int weaponType)
+            : base(name, offense, defense, desc, isequiped, isbuy, salegold)
+        {
+            WeaponType = weaponType;
+        }
+    }
+
+    public class Armor : Item
+    {
+        public int ArmorType;
+
+        public Armor(string name, int offense, int defense, string desc, bool isequiped, bool isbuy, int salegold, int armorType)
+            : base(name, offense, defense, desc, isequiped, isbuy, salegold)
+        {
+            ArmorType = armorType;
+        }
+    }
     public class Inventory
     {
-        public List<Item> inventoryList;
-        public List<Item> shopItemList;
+        public List<Item> itemList;
         public Inventory()
         {
-            inventoryList = new List<Item>();
-            shopItemList = new List<Item>();
+            itemList = new List<Item>();
         }
 
         public void Add(Item item)
         {
-            shopItemList.Add(item);
+            itemList.Add(item);
         }
 
         public void isEquipedInventory()
         {
-            int i = 0;
-            foreach (Item item in inventoryList.Where(item => item.isBuy))
+            foreach (Item item in itemList.Where(item => item.isBuy))
             {
-                i++;
-                Console.WriteLine();
                 Console.Write("- ");
-                Console.Write(i + " ");
 
                 if (item.isEquiped) 
                 { 
-                    Console.Write("[E] ");
+                    Console.Write("[E]");
                 }
 
                 Console.Write($"{item.Name} | ");
@@ -546,45 +559,17 @@ namespace sparta_dungeon
             }
         }
 
-        public void SellingInventory()
+        public List<Item> itemlist()
         {
-            int i = 0;
-            foreach (Item item in inventoryList.Where(item => item.isBuy))
-            {
-                i++;
-                Console.WriteLine();
-                Console.Write("- ");
-                Console.Write(i + " ");
-
-                if (item.isEquiped)
-                {
-                    Console.Write("[E] ");
-                }
-
-                Console.Write($"{item.Name} | ");
-
-                if (item.Offense > 0)
-                {
-                    Console.Write($"공격력 +{item.Offense} ");
-                }
-                if (item.Defense > 0)
-                {
-                    Console.Write($"방어력 +{item.Defense} ");
-                }
-                Console.WriteLine($" | {item.Desc}");
-                Console.WriteLine($" | {item.saleGold * 0.85} G");
-            }
+            return itemList;
         }
 
         public void DisplayShop()
         {
-            int i = 0;
-            foreach (Item item in shopItemList)
+            foreach (Item item in itemList)
             {
-                i++;
-                Console.WriteLine();
                 Console.Write("- ");
-                Console.Write(i + " ");
+
                 Console.Write($"{item.Name} | ");
 
                 if (item.Offense > 0)
