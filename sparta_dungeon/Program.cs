@@ -20,22 +20,22 @@ namespace sparta_dungeon
             //무기
             Item Keyboard = new Item("키보드", 5, 0, "분노로 휘두르면 생각보다 강한 타격을 줍니다만 무기는 아닙니다.", false, false, 100,0);
             inventory.Add(Keyboard);
-            Item OldSword = new Item("낡은 검", 10, 0, "쉽게 볼 수 있는 낡은 검 입니다", false, false, 400,1);
+            Item OldSword = new Item("낡은 검", 10, 0, "쉽게 볼 수 있는 낡은 검 입니다", false, false, 400,0);
             inventory.Add(OldSword);
-            //Item BronzeAxe = new Item("청동 도끼", 15, 0, "어디선가 사용됐던거 같은 도끼입니다.", false, false, 600, 0);
-            //inventory.Add(BronzeAxe);
-            //Item SpartaSpear = new Item("스파르타 창", 30, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 3000, 0);
-            //inventory.Add(SpartaSpear);
+            Item BronzeAxe = new Item("청동 도끼", 15, 0, "어디선가 사용됐던거 같은 도끼입니다.", false, false, 600, 0);
+            inventory.Add(BronzeAxe);
+            Item SpartaSpear = new Item("스파르타 창", 30, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 3000, 0);
+            inventory.Add(SpartaSpear);
 
-            ////방어구
-            //Item BeggarsCloth = new Item("거렁뱅이의 옷", 0, 5, "촌장의 마음보다 넓은 구멍이 뚫려있는 더러운 옷입니다.", false, false, 100, 0);
-            //inventory.Add(BeggarsCloth);
-            //Item TrainingArmor = new Item("수련자갑옷", 0, 10, "수련에 도움을 주는 헐렁한 갑옷입니다.", false, false, 400, 0);
-            //inventory.Add(TrainingArmor);
-            //Item IronArmor = new Item("무쇠 갑옷", 0, 15, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 600, 0);
-            //inventory.Add(IronArmor);
-            //Item SpartaArmor = new Item("스파르타 갑옷", 0, 30, "스파르타 전사들이 입던 갑옷입니다.", false, false, 3000, 0);
-            //inventory.Add(SpartaArmor);
+            //방어구
+            Item BeggarsCloth = new Item("거렁뱅이의 옷", 0, 5, "촌장의 마음보다 넓은 구멍이 뚫려있는 더러운 옷입니다.", false, false, 100, 0);
+            inventory.Add(BeggarsCloth);
+            Item TrainingArmor = new Item("수련자갑옷", 0, 10, "수련에 도움을 주는 헐렁한 갑옷입니다.", false, false, 400, 0);
+            inventory.Add(TrainingArmor);
+            Item IronArmor = new Item("무쇠 갑옷", 0, 15, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 600, 0);
+            inventory.Add(IronArmor);
+            Item SpartaArmor = new Item("스파르타 갑옷", 0, 30, "스파르타 전사들이 입던 갑옷입니다.", false, false, 3000, 0);
+            inventory.Add(SpartaArmor);
         }
 
         //텍스트 컬러 변경 메소드
@@ -706,15 +706,6 @@ namespace sparta_dungeon
             {
                 EquipedWeapon = item;
                 isEquipedWeapon = true;
-                //if (CanEquipItem(item) == true)
-                //{
-                //    EquipedWeapon = item;
-                //    isEquipedWeapon = true;
-                //}
-                //else
-                //{
-                //    Console.WriteLine("장착할 수 없는 직업의 아이템입니다.");
-                //}
             }
             else if (isEquipedWeapon)
             {
@@ -728,15 +719,6 @@ namespace sparta_dungeon
             {
                 EquipedWeapon = item;
                 isEquipedWeapon = true;
-                //if (CanEquipItem(item) == true)
-                //{
-                //    EquipedWeapon = item;
-                //    isEquipedWeapon = true;
-                //}
-                //else
-                //{
-                //    Console.WriteLine("장착할 수 없는 직업의 아이템입니다.");
-                //}
             }
             else if (isEquipedArmor)
             {
