@@ -10,11 +10,13 @@ namespace sparta_dungeon
     {
         static Character player;
         static Inventory inventory = new Inventory();
+        static Dungeon dungeon;
         static void settings()
         {
             player = new Character(1, "", "", 0, 0, 0, 0);        //Charater 객체 생성
             player.SelectName(player);                            //플레이어 이름 설정
             player.SelectJob(player);                             //플레이어 직업 선택                        
+            dungeon = new Dungeon(player);
 
             Item ChainArmor = new Item("무쇠 갑옷", 0, 10, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 300);
             inventory.Add(ChainArmor);
@@ -70,7 +72,7 @@ namespace sparta_dungeon
             Console.WriteLine("1. 상태 보기");
             Console.WriteLine("2. 인벤토리");
             Console.WriteLine("3. 상점");
-            Console.WriteLine("4. 임무");
+            Console.WriteLine("4. 전투 시작");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
             int acton = CheckInput(1, 4);
@@ -91,16 +93,12 @@ namespace sparta_dungeon
                     Shop();
                     break;
                 }
-
                 else if (acton == 4)
                 {
-                    QusetMenu();
+                    dungeon.BattleStart();
                     break;
                 }
-            }
-
-            
-
+            } 
         }
         //반복적으로 State 진입시에 플레이어 스텟이 추가되지 않도록 추가해야함.
         //static void StateUpdate()
@@ -365,162 +363,8 @@ namespace sparta_dungeon
                 ShopSell();
             }
         }
-
-
-
-
-
-        static void QusetMenu() //임무창 구현
-        {
-            Console.Clear();
-            Console.WriteLine("■ Quest!! ■");
-            Console.WriteLine("");
-            Console.WriteLine("1.적을 처치");
-            Console.WriteLine("2.장비를 장착하기");
-            Console.WriteLine("3.더욱 더 강해지기!");
-            Console.WriteLine("");
-            Console.WriteLine("0. 나가기");
-            Console.WriteLine("");
-
-            int acton = int.Parse(Console.ReadLine());
-            bool isMain = true;
-            do
-            {
-                isMain = false;
-
-                if (acton == 0)
-                {
-                    Start();
-                }
-
-                else if (acton == 1)
-                {
-                    QuestFirst();
-                }
-                else if (acton == 2)
-                {
-                    QuestSecond();
-                }
-                else if (acton == 3)
-                {
-                    QuestThird();
-                }
-            } while (isMain);
-
-        }
-
-        static void QuestFirst()
-        {
-            Console.Clear();
-            Console.WriteLine("■ Quest!! ■");
-            Console.WriteLine("");
-            Console.WriteLine("적을 처치");
-            Console.WriteLine("");
-            Console.WriteLine("이봐! 적들이 많아졌어.\n안전을 위해서라도 수를 줄여야겠는데.\n자네가 좀 처치해주게!");
-            Console.WriteLine("");
-            Console.WriteLine("적 3마리 처치 (0/3)");
-            Console.WriteLine("");
-            Console.WriteLine("-보상-   \n[칭호]숙련된전사");
-            Console.WriteLine("");
-            Console.WriteLine("0. 나가기");
-            int acton = int.Parse(Console.ReadLine());
-            bool isMain = true;
-
-            do
-            {
-                isMain = false;
-
-                if (acton == 0)
-                {
-                    Start();
-                }
-                else
-                {
-                    Console.WriteLine("잘못된 입력입니다.");
-                    acton = int.Parse(Console.ReadLine());
-                    isMain = true;
-                }
-            } while (isMain);
-
-
-        }
-
-        static void QuestSecond()
-        {
-            Console.Clear();
-            Console.WriteLine("■ Quest!! ■");
-            Console.WriteLine("");
-            Console.WriteLine("장비를 장착하기");
-            Console.WriteLine("");
-            Console.WriteLine("이봐! 모험은 처음이지?\n장비는 모험의 기본이지.\n한 번 잡아보라구!");
-            Console.WriteLine("");
-            Console.WriteLine("'장비관리'에서 장비를 장착하기");
-            Console.WriteLine("");
-            Console.WriteLine("-보상-   \nGold 500");
-            Console.WriteLine("");
-            Console.WriteLine("0. 나가기");
-            int acton = int.Parse(Console.ReadLine());
-            bool isMain = true;
-
-            do
-            {
-                isMain = false;
-
-                if (acton == 0)
-                {
-                    Start();
-                }
-                else
-                {
-                    Console.WriteLine("잘못된 입력입니다.");
-                    acton = int.Parse(Console.ReadLine());
-                    isMain = true;
-                }
-            } while (isMain);
-        }
-        static void QuestThird()
-        {
-            Console.Clear();
-            Console.WriteLine("■ Quest!! ■");
-            Console.WriteLine("");
-            Console.WriteLine("더욱 더 강해지기!");
-            Console.WriteLine("");
-            Console.WriteLine("어엿한 모험가로군\n모험의 첫걸음을 옮길 때가 왔어.\n앞길을 막는 녀석은 모두 날려버려.");
-            Console.WriteLine("");
-            Console.WriteLine("'장비관리'에서 장비를 장착하기");
-            Console.WriteLine("");
-            Console.WriteLine("-보상-   \nGold 500");
-            Console.WriteLine("");
-            Console.WriteLine("0. 나가기");
-            int acton = int.Parse(Console.ReadLine());
-            bool isMain = true;
-
-            do
-            {
-                isMain = false;
-
-                if (acton == 0)
-                {
-                    Start();
-                }
-                else
-                {
-                    Console.WriteLine("잘못된 입력입니다.");
-                    acton = int.Parse(Console.ReadLine());
-                    isMain = true;
-                }
-            } while (isMain);
-        }
     }
-
-
-
-
-
-
     
-    
-
     class Character
     {
         public int Lv;
@@ -771,6 +615,199 @@ namespace sparta_dungeon
                     Console.WriteLine($" | {item.saleGold} G"); 
                 }
             }
+        }
+    }
+    public class Monster
+    {
+        public string Name;
+        public int Lv;
+        public int Hp;
+        public int Offense;
+        public int Defense;
+        public string Desc;//description(변수명)
+
+        public List<Monster> monsters;
+        public void Monsters()
+        {
+            monsters = new List<Monster>();
+        }
+        public void Add(Monster monster)
+        {
+            monster.Add(monster);
+        }
+        public Monster(string name, int level, int hp, int offense, int defense, string desc)
+        {
+            Name = name;
+            Lv = level;
+            Hp = hp;
+            Offense = offense;
+            Defense = defense;
+            Desc = desc;
+        }
+    }
+
+    internal class Dungeon
+    {
+        Character player;
+        List<Monster> monsters;
+        Random random = new Random();
+        int max_hp;
+
+        //이제 필요없나?
+        public Dungeon(Character player)
+        {
+
+            this.player = player;
+            monsters = new List<Monster>();
+        }
+        public void BattleStart()
+        {
+            Monster minion = new Monster("미니언", 2, 15, 10, 0, "나약한 미니언이다.");
+            monsters.Add(minion);
+            Monster voidinsect = new Monster("공허충", 3, 20, 15, 1, "공허충입니다.");
+            monsters.Add(voidinsect);
+            Monster cannonminion = new Monster("대포미니언", 4, 30, 20, 3, "대포미니언입니다.");
+            monsters.Add(cannonminion);
+            int max_hp = player.Hp;
+            while (player.Hp > 0 && player.Hp > 0 && monsters.Any(m => m.Hp > 0))
+            {
+                Console.Clear();
+
+                Console.WriteLine("Battle!!\n");
+                foreach (var monster in monsters)
+                {
+                    Console.Write($"Lv.{monster.Lv} {monster.Name} ");
+                    if (monster.Hp > 0)
+                        Console.WriteLine($"HP {monster.Hp}");
+                    else
+                        Console.WriteLine("Dead");
+                }
+                Console.WriteLine();
+                Console.WriteLine($"[내정보]\n" +
+                    $"Lv.{player.Lv} {player.Name} ({player.Job})\n" +
+                    $"HP {player.Hp}/100\n");
+
+
+                Console.WriteLine("1. 공격\n");
+                Console.WriteLine("2. 스킬(미구현)\n");
+
+                Console.WriteLine("원하시는 행동을 입력해주세요.");
+                Console.Write(">>");
+                int acton = int.Parse(Console.ReadLine());
+                if (acton == 1)
+                    playerAttack();
+
+                
+                //몬스터 턴
+                foreach (var monster in monsters)
+                {
+                    if (player.Hp <= 0 || monster.Hp <= 0)
+                    {
+                        continue;
+                    }
+                    MonsterAttack(monster);
+                    Console.Clear();
+                    Console.WriteLine("Battle!!\n");
+                }
+            }
+            Result();
+        }
+        public void playerAttack()
+        {
+            Console.Clear();
+            for (int i = 0; i < monsters.Count; i++)
+            {
+                if (monsters[i].Hp > 0)
+                {
+                    Console.WriteLine($"[{i + 1}] Lv.{monsters[i].Lv} {monsters[i].Name} HP {monsters[i].Hp}");
+                }
+            }
+            Console.WriteLine();
+            Console.WriteLine($"[내정보]\n" +
+                    $"Lv.{player.Lv} {player.Name} ({player.Job})\n" +
+                    $"HP {player.Hp}/100\n");
+            Console.WriteLine("대상을 선택하세요.");
+            int acton = int.Parse(Console.ReadLine());
+            if (acton <= monsters.Count && monsters[acton - 1].Hp > 0)
+            {
+                Console.WriteLine("잘못된 입력입니다.");
+            }
+            Console.Clear();
+            Console.WriteLine("Battle!!\n");
+
+            // [player 공격 로직]
+            Random random = new Random();
+            int damage = random.Next(9, 12);
+
+            Console.WriteLine(player.Name + "의 공격!");
+            Console.WriteLine("Lv. " + monsters[acton - 1].Name + "을(를) 맞췄습니다. [데미지 : " + (int)(player.Offense * (0.1 * damage)) + "]");
+            Console.WriteLine("");
+            Console.WriteLine("Lv. " + monsters[acton - 1].Lv + " " + monsters[acton - 1].Name);
+            Console.Write("HP " + monsters[acton - 1].Hp + " -> ");
+
+            monsters[acton - 1].Hp -= (int)(player.Offense * (0.1 * damage));
+            if (monsters[acton - 1].Hp > 0)
+                Console.WriteLine("HP " + monsters[acton - 1].Hp);
+            else
+            {
+                monsters[acton - 1].Hp = 0;
+                Console.WriteLine("Dead");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("0. 다음\n");
+
+            Console.WriteLine(">>");
+            Console.ReadLine();
+        }
+
+        public void MonsterAttack(Monster monster)
+        {
+            if (player.Hp > 0)
+            {
+                Console.WriteLine("Lv. " + monster.Lv + " " + monster.Name + "의 공격!");
+                Console.WriteLine(player.Name + "을(를) 맞췄습니다. [데미지 : " + monster.Offense + "]");
+                Console.WriteLine("");
+                Console.WriteLine("Lv. " + player.Lv + " " + player.Name);
+                Console.Write("HP " + player.Hp + " -> ");
+                player.Hp -= monster.Offense;
+                if (player.Hp > 0)
+                    Console.WriteLine("HP " + player.Hp);
+                else
+                {
+                    player.Hp = 0;
+                    Console.WriteLine("Dead");
+                }
+            }
+            Console.WriteLine("엔터를 입력하세요");
+            Console.ReadLine();
+        }
+        public void Result()
+        {
+            Console.Clear();
+            Console.WriteLine("Battle!! - Result\n");
+            if (player.Hp > 0)
+            {
+                Console.WriteLine("Victory\n");
+                Console.WriteLine($"던전에서 몬스터 {monsters.Count}마리를 잡았습니다.\n");
+                Console.WriteLine($"Lv.{player.Lv} {player.Name}");
+                Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
+            }
+            else
+            {
+                Console.WriteLine("You Lose\n");
+                Console.WriteLine($"Lv.{player.Lv} {player.Name}");
+                Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
+
+            }
+            Console.WriteLine("0. 다음\n");
+
+            Console.WriteLine(">>");
+            Console.WriteLine("엔터를 입력하면 마을로 이동합니다.");
+
+            //일단 종료하지는 않고 마을로 이동함(회복아이템?)
+            Console.ReadLine();
+            Program.Start();
         }
     }
 }
