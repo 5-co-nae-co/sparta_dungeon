@@ -444,7 +444,7 @@ namespace sparta_dungeon
                         Console.WriteLine("선택한 직업은 도적입니다.");
                         character.Lv = 1;
                         character.Job = "도적";
-                        character.Offense = 20;
+                        character.Offense = 200;
                         character.Defence = 5;
                         character.Hp = 100;
                         character.Gold = 1500;
@@ -662,6 +662,7 @@ namespace sparta_dungeon
         }
         public void BattleStart()
         {
+            monsters.Clear();
             Monster minion = new Monster("미니언", 2, 15, 10, 0, "나약한 미니언이다.");
             monsters.Add(minion);
             Monster voidinsect = new Monster("공허충", 3, 20, 15, 1, "공허충입니다.");
@@ -693,10 +694,16 @@ namespace sparta_dungeon
 
                 Console.WriteLine("원하시는 행동을 입력해주세요.");
                 Console.Write(">>");
-                int acton = int.Parse(Console.ReadLine());
-                if (acton == 1)
-                    playerAttack();
 
+                int acton = Program.CheckInput(1, 1);
+                while (true)
+                {
+                    if (acton == 1)
+                    {
+                        playerAttack();
+                        break;
+                    }
+                }
                 
                 //몬스터 턴
                 foreach (var monster in monsters)
@@ -725,13 +732,11 @@ namespace sparta_dungeon
             Console.WriteLine();
             Console.WriteLine($"[내정보]\n" +
                     $"Lv.{player.Lv} {player.Name} ({player.Job})\n" +
-                    $"HP {player.Hp}/100\n");
+                    $"HP {player.Hp}/{max_hp}\n");
             Console.WriteLine("대상을 선택하세요.");
-            int acton = int.Parse(Console.ReadLine());
-            if (acton <= monsters.Count && monsters[acton - 1].Hp > 0)
-            {
-                Console.WriteLine("잘못된 입력입니다.");
-            }
+            
+            int acton = Program.CheckInput(1, monsters.Count);
+            
             Console.Clear();
             Console.WriteLine("Battle!!\n");
 
@@ -807,6 +812,7 @@ namespace sparta_dungeon
 
             //일단 종료하지는 않고 마을로 이동함(회복아이템?)
             Console.ReadLine();
+            Console.Clear();
             Program.Start();
         }
     }
