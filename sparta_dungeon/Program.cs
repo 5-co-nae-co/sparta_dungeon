@@ -19,7 +19,7 @@ namespace sparta_dungeon
             dungeon = new Dungeon(player);
 
             //소모품
-            Item HealthPotion = new Item("치유 물약", -1, -1, "체력을 30 회복 시켜주는 물약 입니다.", false, false, 300);
+            Item HealthPotion = new Item("치유 물약", -1, -1, "체력을 30 회복 시켜주는 물약 입니다.", false, false, 300, 0);
             inventory.Add(HealthPotion);
 
             //무기
@@ -457,7 +457,12 @@ namespace sparta_dungeon
                 else if (acton <= itemList.Count)
                 {
                     Item inputItem = itemList[acton - 1];
-                    if (inputItem.isBuy)
+                    if (inputItem.Offense < 0)
+                    {
+                        inventory.inventoryList.Remove(inputItem);
+                        player.Gold += (inputItem.saleGold * 85 / 100);
+                    }
+                    else if (inputItem.isBuy)
                     {
                         if (inputItem == player.EquipedWeapon) //판매 전에 장비 상태 해체
                         {
@@ -797,7 +802,7 @@ namespace sparta_dungeon
                 }
                 Console.Write(" | ");
                 Program.ColorText($"{item.Desc}\n", ConsoleColor.White);
-                Program.ColorText($" | {item.saleGold * 0.85} G\n", ConsoleColor.Green);
+                Program.ColorText($" | {item.saleGold * 0.85}G\n", ConsoleColor.Green);
             }
         }
 
@@ -808,7 +813,6 @@ namespace sparta_dungeon
             foreach (Item item in shopItemList)
             {
                 i++;
-                Console.WriteLine();
                 Console.Write("- ");
                 Console.Write(i);
                 Program.ColorText($" {item.Name}", ConsoleColor.Cyan);
@@ -820,7 +824,8 @@ namespace sparta_dungeon
                 }
                 if (item.Defense > 0)
                 {
-                    Console.Write($"방어력 +{item.Defense} ");
+                    Console.Write(" | ");
+                    Program.ColorText($"방어력 +{item.Defense} ", ConsoleColor.Green);
                 }
                 Console.Write($" | {item.Desc} |");
                 if (item.ItemType == 0)
@@ -839,7 +844,6 @@ namespace sparta_dungeon
                 {
                     Console.Write(" 궁수");
                 }
-                Console.WriteLine();
                 Console.WriteLine();
                 if (item.isBuy)
                 {
