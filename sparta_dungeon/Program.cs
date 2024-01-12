@@ -115,8 +115,8 @@ namespace sparta_dungeon
             Console.WriteLine("캐릭터의 정보가 표시됩니다.");
             Console.WriteLine($"Lv. {player.Lv}");
             Console.WriteLine($"{player.Name} ( {player.Job} )");        //"Chad > {player.Name}
-            Console.WriteLine($"공격력 : {player.Offense + player.AddedOffense}" + (player.AddedOffense == 0 ? "" : ($" ({ player.AddedOffense})")));
-            Console.WriteLine($"방어력 : {player.Defence + player.AddedDefence}" + (player.AddedDefence == 0 ? "" : ($" ({player.AddedDefence})")));
+            Console.WriteLine($"공격력 : {player.Offense + player.AddedOffense}" + (player.AddedOffense == 0 ? "" : ($" (+{ player.AddedOffense})")));
+            Console.WriteLine($"방어력 : {player.Defence + player.AddedDefence}" + (player.AddedDefence == 0 ? "" : ($" (+{player.AddedDefence})")));
             Console.WriteLine($"체력 : {player.Hp}");
             Console.WriteLine($"Gold : {player.Gold}");
             Console.WriteLine();
