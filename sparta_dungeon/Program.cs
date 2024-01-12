@@ -23,23 +23,23 @@ namespace sparta_dungeon
             inventory.Add(HealthPotion);
 
             //무기
-            Item Keyboard = new Item("키보드", 5, 0, "분노로 휘두르면 생각보다 강한 타격을 줍니다만 무기는 아닙니다.", false, false, 100);
+            Item Keyboard = new Item("키보드", 5, 0, "분노로 휘두르면 생각보다 강한 타격을 줍니다만 무기는 아닙니다.", false, false, 100,0);
             inventory.Add(Keyboard);
-            Item OldSword = new Item("낡은 검", 10, 0, "쉽게 볼 수 있는 낡은 검 입니다", false, false, 400);
+            Item OldSword = new Item("낡은 검", 10, 0, "쉽게 볼 수 있는 낡은 검 입니다", false, false, 400,0);
             inventory.Add(OldSword);
-            Item BronzeAxe = new Item("청동 도끼", 15, 0, "어디선가 사용됐던거 같은 도끼입니다.", false, false, 600);
+            Item BronzeAxe = new Item("청동 도끼", 15, 0, "어디선가 사용됐던거 같은 도끼입니다.", false, false, 600, 0);
             inventory.Add(BronzeAxe);
-            Item SpartaSpear = new Item("스파르타 창", 30, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 3000);
+            Item SpartaSpear = new Item("스파르타 창", 30, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 3000, 0);
             inventory.Add(SpartaSpear);
 
             //방어구
-            Item BeggarsCloth = new Item("거렁뱅이의 옷", 0, 5, "촌장의 마음보다 넓은 구멍이 뚫려있는 더러운 옷입니다.", false, false, 100);
+            Item BeggarsCloth = new Item("거렁뱅이의 옷", 0, 5, "촌장의 마음보다 넓은 구멍이 뚫려있는 더러운 옷입니다.", false, false, 100, 0);
             inventory.Add(BeggarsCloth);
-            Item TrainingArmor = new Item("수련자갑옷", 0, 10, "수련에 도움을 주는 헐렁한 갑옷입니다.", false, false, 400);
+            Item TrainingArmor = new Item("수련자갑옷", 0, 10, "수련에 도움을 주는 헐렁한 갑옷입니다.", false, false, 400, 0);
             inventory.Add(TrainingArmor);
-            Item IronArmor = new Item("무쇠 갑옷", 0, 15, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 600);
+            Item IronArmor = new Item("무쇠 갑옷", 0, 15, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 600, 0);
             inventory.Add(IronArmor);
-            Item SpartaArmor = new Item("스파르타 갑옷", 0, 30, "스파르타 전사들이 입던 갑옷입니다.", false, false, 3000);
+            Item SpartaArmor = new Item("스파르타 갑옷", 0, 30, "스파르타 전사들이 입던 갑옷입니다.", false, false, 3000, 0);
             inventory.Add(SpartaArmor);
         }
         //텍스트 컬러 변경 메소드
@@ -187,7 +187,6 @@ namespace sparta_dungeon
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
 
-
             int acton = CheckInput(0, 0);
             while (true)
             {
@@ -272,48 +271,56 @@ namespace sparta_dungeon
                     //NOTE 현재 공격력 방어력으로 구분되는 아이템 클래스가 이후 아이템 추가로
                     //공격력 방어력 두가지 스탯을 동시에 가진 아이템이 나오게 되면 문제가 생김
                     Item inputItem = itemList[acton - 1];
-                    if (inputItem.Offense < 0) // 소모품 사용 (소모품들은 각자 - 스탯 값을 가지고 있어 이를 체크)
+                    if(player.CanEquipItem(inputItem) == true)
                     {
-                        player.UseConsumable(inputItem);
-                        inventory.inventoryList.Remove(inputItem);
+                        if (inputItem.Offense < 0) // 소모품 사용 (소모품들은 각자 - 스탯 값을 가지고 있어 이를 체크)
+                        {
+                            player.UseConsumable(inputItem);
+                            inventory.inventoryList.Remove(inputItem);
+                        }
+                        else if (inputItem.Offense > 0) //장착 대상이 무기일 때
+                        {
+                            if (player.EquipedWeapon == inputItem)
+                            {
+                                inputItem.isEquiped = false;
+                            }
+                            else if (player.isEquipedWeapon) //이미 장착 중인 무기가 있을 때 해제 후 장착
+                            {
+                                player.EquipedWeapon.isEquiped = false;
+                                player.EquipedWeapon = null;
+                                player.isEquipedWeapon = false;
+                                inputItem.isEquiped = true;
+                            }
+                            else if (!player.isEquipedWeapon) //장착 중인 무기가 없을 때 장착
+                            {
+                                inputItem.isEquiped = true;
+                            }
+                            player.EquipWeapon(inputItem);
+                        }
+                        else if (inputItem.Defense > 0) //장착 대상이 방어구일 때
+                        {
+                            if (player.EquipedArmor == inputItem) //장착 중인 방어구 해제
+                            {
+                                inputItem.isEquiped = false;
+                            }
+                            else if (player.isEquipedArmor) //이미 장착 중인 방어구가 있을 때 해제 후 장착
+                            {
+                                player.EquipedArmor.isEquiped = false;
+                                player.EquipedArmor = null;
+                                player.isEquipedArmor = false;
+                                inputItem.isEquiped = true;
+                            }
+                            else if (!player.isEquipedArmor) //장착 중인 방어구가 없을 때 장착
+                            {
+                                inputItem.isEquiped = true;
+                            }
+                            player.EquipArmor(inputItem);
+                        }
                     }
-                    else if (inputItem.Offense > 0) //장착 대상이 무기일 때
+                    else
                     {
-                        if (player.EquipedWeapon == inputItem)
-                        {
-                            inputItem.isEquiped = false;
-                        }
-                        else if (player.isEquipedWeapon) //이미 장착 중인 무기가 있을 때 해제 후 장착
-                        {
-                            player.EquipedWeapon.isEquiped = false;
-                            player.EquipedWeapon = null;
-                            player.isEquipedWeapon = false;
-                            inputItem.isEquiped = true;
-                        }
-                        else if (!player.isEquipedWeapon) //장착 중인 무기가 없을 때 장착
-                        {
-                            inputItem.isEquiped = true;
-                        }
-                        player.EquipWeapon(inputItem);
-                    }
-                    else if (inputItem.Defense > 0) //장착 대상이 방어구일 때
-                    {
-                        if (player.EquipedArmor == inputItem) //장착 중인 방어구 해제
-                        {
-                            inputItem.isEquiped = false;
-                        }
-                        else if (player.isEquipedArmor) //이미 장착 중인 방어구가 있을 때 해제 후 장착
-                        {
-                            player.EquipedArmor.isEquiped = false;
-                            player.EquipedArmor = null;
-                            player.isEquipedArmor = false;
-                            inputItem.isEquiped = true;
-                        }
-                        else if (!player.isEquipedArmor) //장착 중인 방어구가 없을 때 장착
-                        {
-                            inputItem.isEquiped = true;
-                        }
-                        player.EquipArmor(inputItem);
+                        Program.SlowText("다른 직업의 장비입니다", 30);
+                        Thread.Sleep(800);
                     }
                 }
                 CalcAddedStat();
@@ -508,6 +515,7 @@ namespace sparta_dungeon
     {
         public int Lv;
         public string Job;
+        public static int JobType;  // 1.전사 2. 도적 3.궁수
         public string Name;
         public int Offense;
         public int Defence;
@@ -530,6 +538,16 @@ namespace sparta_dungeon
             Defence = defense;
             Hp = hp;
             Gold = gold;
+        }
+
+        public bool CanEquipItem(Item item)   // 아이템이 착용 가능한지 확인
+        {
+            if (item.ItemType == 0 || item.ItemType == Character.JobType)
+            {
+                return true;
+            }
+            else
+                return false;
         }
 
         public void SelectName(Character character)     // 이름 선택 화면
@@ -601,6 +619,7 @@ namespace sparta_dungeon
                         character.Defence = 10;
                         character.Hp = 200;
                         character.Gold = 1500;
+                        Character.JobType = 1;
                         break;
                     case 2:
                         Console.WriteLine("선택한 직업은 도적입니다.");
@@ -610,6 +629,7 @@ namespace sparta_dungeon
                         character.Defence = 5;
                         character.Hp = 100;
                         character.Gold = 1500;
+                        Character.JobType = 2;
                         break;
                     case 3:
                         Console.WriteLine("선택한 직업은 궁수입니다.");
@@ -619,12 +639,13 @@ namespace sparta_dungeon
                         character.Defence = 5;
                         character.Hp = 150;
                         character.Gold = 1500;
+                        Character.JobType = 3;
                         break;
                 }
             }
         }
 
-        public void EquipWeapon(Item item)
+        public  void EquipWeapon(Item item)
         {
             if (!isEquipedWeapon)
             {
@@ -641,8 +662,8 @@ namespace sparta_dungeon
         {
             if (!isEquipedArmor)
             {
-                EquipedArmor = item;
-                isEquipedArmor = true;
+                EquipedWeapon = item;
+                isEquipedWeapon = true;
             }
             else if (isEquipedArmor)
             {
@@ -687,8 +708,9 @@ namespace sparta_dungeon
         public bool isEquiped;
         public bool isBuy;
         public int saleGold;
+        public int ItemType; // 공용 아이템은 0, 전사는 1, 도적은 2, 궁수는 3
 
-        public Item(string name, int offense, int defense, string desc, bool isequiped, bool isbuy, int salegold)
+        public Item (string name, int offense, int defense, string desc, bool isequiped, bool isbuy, int salegold, int itemType)
         {
             Name = name;
             Offense = offense;
@@ -697,12 +719,14 @@ namespace sparta_dungeon
             isEquiped = isequiped;
             isBuy = isbuy;
             saleGold = salegold;
+            ItemType = itemType;
         }
     }
     public class Inventory
     {
         public List<Item> inventoryList;
         public List<Item> shopItemList;
+
         public Inventory()
         {
             inventoryList = new List<Item>();
@@ -780,9 +804,11 @@ namespace sparta_dungeon
         public void DisplayShop()
         {
             int i = 0;
+
             foreach (Item item in shopItemList)
             {
                 i++;
+                Console.WriteLine();
                 Console.Write("- ");
                 Console.Write(i);
                 Program.ColorText($" {item.Name}", ConsoleColor.Cyan);
@@ -794,13 +820,27 @@ namespace sparta_dungeon
                 }
                 if (item.Defense > 0)
                 {
-                    Console.Write(" | ");
-                    Program.ColorText($"방어력 +{item.Defense} ", ConsoleColor.Green);
+                    Console.Write($"방어력 +{item.Defense} ");
                 }
-                Console.Write(" | ");
-                Program.ColorText($"{item.Desc}\n", ConsoleColor.White);
-
-                //이미 구매 했을때
+                Console.Write($" | {item.Desc} |");
+                if (item.ItemType == 0)
+                {
+                    Console.Write(" 공용");
+                }
+                else if (item.ItemType == 1)
+                {
+                    Console.Write(" 전사");
+                }
+                else if (item.ItemType == 2)
+                {
+                    Console.Write(" 도적");
+                }
+                else if (item.ItemType == 3)
+                {
+                    Console.Write(" 궁수");
+                }
+                Console.WriteLine();
+                Console.WriteLine();
                 if (item.isBuy)
                 {
                     Program.ColorText($" | 구매완료\n", ConsoleColor.Red);
@@ -992,6 +1032,9 @@ namespace sparta_dungeon
             else
             {
                 Console.WriteLine("You Lose\n");
+                Console.WriteLine($"Lv.{player.Lv} {player.Name}");
+                Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
+
                 Console.WriteLine($"Lv.{player.Lv} {player.Name}");
                 Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
 
