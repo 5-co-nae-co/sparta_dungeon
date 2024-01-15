@@ -9,6 +9,7 @@ using sparta_dungeon;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
+using System;
 
 namespace sparta_dungeon
 {
@@ -1033,11 +1034,8 @@ internal class Dungeon
     {
         monsters.Clear();
 
-        int choHealth = 350;
-        int gallHealth = 350;
-
-        Monster cho = new Monster("초", 6, choHealth, 20, 0, "한 몸을 공유하는 두 형제입니다.");
-        Monster gall = new Monster("갈", 6, gallHealth, 35, 0, "두 형제 중 마법사입니다.");
+        Monster cho = new Monster("초", 6, 350, 20, 0, "한 몸을 공유하는 두 형제입니다.");
+        Monster gall = new Monster("갈", 6, 350, 35, 0, "두 형제 중 마법사입니다.");
 
         monsters.Add(cho);
         monsters.Add(gall);
@@ -1144,7 +1142,21 @@ internal class Dungeon
             Console.WriteLine("Lv. " + monsters[acton - 1].Lv + " " + monsters[acton - 1].Name);
             Console.Write("HP " + monsters[acton - 1].Hp + " -> ");
 
-            monsters[acton - 1].Hp -= (int)(player.Offense * (0.1 * damage));
+            if (monsters[acton - 1].Name == "초" || monsters[acton - 1].Name == "갈") //초갈용 대미지 계산
+            {
+                if(monsters[acton - 1].Name == "초")
+                {
+                    monsters[acton - 1].Hp -= (int)(player.Offense + player.AddedOffense * (0.1 * damage));
+                    monsters[acton].Hp -= (int)(player.Offense + player.AddedOffense * (0.1 * damage));
+                }
+                else
+                {
+                    monsters[acton - 1].Hp -= (int)(player.Offense + player.AddedOffense * (0.1 * damage));
+                    monsters[acton - 2].Hp -= (int)(player.Offense + player.AddedOffense * (0.1 * damage));
+                }
+            }
+            else
+                monsters[acton - 1].Hp -= (int)(player.Offense + player.AddedOffense * (0.1 * damage));
             if (monsters[acton - 1].Hp > 0)
                 Console.WriteLine("HP " + monsters[acton - 1].Hp);
             else
@@ -1263,8 +1275,21 @@ internal class Dungeon
         Console.WriteLine("Lv. " + monsters[acton - 1].Name + "을(를) 맞췄습니다. [데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2) + "]\n");
         Console.WriteLine("Lv. " + monsters[acton - 1].Lv + " " + monsters[acton - 1].Name);
         Console.Write("HP " + monsters[acton - 1].Hp + " -> ");
-
-        monsters[acton - 1].Hp -= (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2);
+        if (monsters[acton - 1].Name == "초" || monsters[acton - 1].Name == "갈") //초갈용 대미지 계산
+        {
+            if (monsters[acton - 1].Name == "초")
+            {
+                monsters[acton - 1].Hp -= (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2);
+                monsters[acton].Hp -= (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2);
+            }
+            else
+            {
+                monsters[acton - 1].Hp -= (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2);
+                monsters[acton - 2].Hp -= (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2);
+            }
+        }
+        else
+            monsters[acton - 1].Hp -= (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2);
         if (monsters[acton - 1].Hp > 0)
             Console.WriteLine("HP " + monsters[acton - 1].Hp);
         else
@@ -1291,6 +1316,14 @@ internal class Dungeon
         {
             if (monster.Hp > 0)
                 monstercount++;
+            if (monster.Name == "초" || monster.Name == "갈")
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Program.SlowText("\n\n 초&갈 : \"우리는 둘이지만 몸은 하나다! 그런 수법에 당하지 않는다!\"", 50);
+                Console.ResetColor();
+                Thread.Sleep(600);
+                return;
+            }
         }
         if (monstercount < 2)
         {
@@ -1300,8 +1333,8 @@ internal class Dungeon
             playerSkill();
             return;
         }
-        
-        Random random = new Random();
+
+            Random random = new Random();
         double damage = random.Next(9, 12);
         if (15 > random.Next(1, 101))
             damage = damage * 1.6;
