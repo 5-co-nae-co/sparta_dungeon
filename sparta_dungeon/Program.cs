@@ -6,6 +6,8 @@ using System.Numerics;
 using System.Xml.Linq;
 using static sparta_dungeon.Inventory;
 using sparta_dungeon;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace sparta_dungeon
 {
@@ -132,11 +134,13 @@ namespace sparta_dungeon
             Console.WriteLine("2. 인벤토리");
             Console.WriteLine("3. 상점");
             Console.WriteLine("4. 전투 시작");
+            Console.WriteLine("5. 게임 저장");
+            Console.WriteLine("6. 게임 불러오기");
             Console.ResetColor();
             Console.WriteLine("\n-----------------------------------------------------------------------");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
-            int acton = CheckInput(1, 4);
+            int acton = CheckInput(1, 6);
             while (true)
             {
                 if (acton == 1)
@@ -165,6 +169,78 @@ namespace sparta_dungeon
                     dungeon.EnterDungeon();
                     break;
                 }
+                else if (acton == 5)
+                {
+                    // Json
+                    string _fileName = "playerInfo.json";
+                    string _itemFileName = "itemList.json";
+                    // 데이터 경로 저장. (C드라이브, Documents)
+                    // Json 저장(파일로 저장)
+                    string _userDocumentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                    string _filePath = Path.Combine(_userDocumentsFolder, _fileName);
+                    string _itemFilePath = Path.Combine(_userDocumentsFolder, _itemFileName);
+                    string _playerJson = JsonConvert.SerializeObject(player, Formatting.Indented);
+                    string _itemJson = JsonConvert.SerializeObject(inventory.inventoryList, Formatting.Indented);
+                    File.WriteAllText(_filePath, _playerJson);
+                    File.WriteAllText(_itemFilePath, _itemJson);
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    SlowText("저장중 입니다...", 50);
+                    Console.ResetColor();
+                    Thread.Sleep(1000);
+                    Start();
+                    break;
+                }
+                else if (acton == 6)
+                {
+                    LoadGameData();
+                    Start();
+                    break;
+                }
+            }
+        }
+        static void LoadGameData()
+        {
+            string _playerFileName = "playerInfo.json";
+            string _itemFileName = "itemList.json";
+            // 데이터 경로 불러오기. (C드라이브, Documents)
+            string _userDocumentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+            // 플레이어 데이터 로드
+            string _playerFilePath = Path.Combine(_userDocumentsFolder, _playerFileName);
+            if (File.Exists(_playerFilePath))
+            {
+                string _playerJson = File.ReadAllText(_playerFilePath);
+                player = JsonConvert.DeserializeObject<Character>(_playerJson);
+                Console.ForegroundColor = ConsoleColor.Red;
+                SlowText("플레이어 데이터를 불러왔습니다.", 50);
+                Thread.Sleep(600);
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                SlowText("저장된 플레이어 데이터가 없습니다.", 50);
+                Thread.Sleep(600);
+                Console.ResetColor();
+            }
+
+            // 아이템 데이터 로드
+            string _itemFilePath = Path.Combine(_userDocumentsFolder, _itemFileName);
+            if (File.Exists(_itemFilePath))
+            {
+                string _itemJson = File.ReadAllText(_itemFilePath);
+                inventory.inventoryList = JsonConvert.DeserializeObject<List<Item>>(_itemJson);
+                Console.ForegroundColor = ConsoleColor.Red;
+                SlowText("아이템 데이터를 불러왔습니다.", 50);
+                Thread.Sleep(600);
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                SlowText("저장된 아이템 데이터가 없습니다.", 50);
+                Thread.Sleep(600);
+                Console.ResetColor();
             }
         }
 
@@ -557,7 +633,6 @@ namespace sparta_dungeon
             else
                 return false;
         }
-
         public void SelectName(Character character)     // 이름 선택 화면
         {
             bool isCorrectName = false;
