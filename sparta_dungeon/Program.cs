@@ -609,6 +609,8 @@ namespace sparta_dungeon
         public int Gold;
         public int AddedOffense; //아이템 추가 공격력
         public int AddedDefence; //아이템 추가 방어력
+        public int Exp {  get; set; }
+        public int ExpToLevelUp {  get; set; }
 
         public Item EquipedWeapon;
         public Item EquipedArmor;
@@ -625,6 +627,8 @@ namespace sparta_dungeon
             Hp = hp;
             Mp = mp;
             Gold = gold;
+            Exp = 0;
+            ExpToLevelUp = 10;
         }
 
         public bool CanEquipItem(Item item)   // 아이템이 착용 가능한지 확인
@@ -984,6 +988,9 @@ internal class Dungeon
     Random random = new Random();
     int max_hp;
     int max_mp;
+    int him;
+    int bango;
+
 
     //이제 필요없나?
     public Dungeon(Character player)
@@ -1133,7 +1140,7 @@ internal class Dungeon
         //기본공격시 회피 기능
         if (random.Next(1, 101) > 10)
         {
-            Console.WriteLine("Lv. " + monsters[acton - 1].Lv + "을(를) 맞췄습니다. [데미지 : " + (int)(player.Offense * (0.1 * damage)) + "]\n");
+            Console.WriteLine("Lv. " + monsters[acton - 1].Lv + "을(를) 맞췄습니다. [데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage)) + "]\n");
             Console.WriteLine("Lv. " + monsters[acton - 1].Lv + " " + monsters[acton - 1].Name);
             Console.Write("HP " + monsters[acton - 1].Hp + " -> ");
 
@@ -1252,11 +1259,12 @@ internal class Dungeon
         Console.Clear();
         Console.WriteLine(player.Name + "의 알파 스트라이크!");
         Console.WriteLine($"MP {now_mp} -> {player.Mp}");
-        Console.WriteLine("Lv. " + monsters[acton - 1].Lv + "을(를) 맞췄습니다. [데미지 : " + (int)(player.Offense * (0.1 * damage) * 2) + "]\n");
+        Console.WriteLine("him" + him);
+        Console.WriteLine("Lv. " + monsters[acton - 1].Name + "을(를) 맞췄습니다. [데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2) + "]\n");
         Console.WriteLine("Lv. " + monsters[acton - 1].Lv + " " + monsters[acton - 1].Name);
         Console.Write("HP " + monsters[acton - 1].Hp + " -> ");
 
-        monsters[acton - 1].Hp -= (int)(player.Offense * (0.1 * damage) * 2);
+        monsters[acton - 1].Hp -= (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2);
         if (monsters[acton - 1].Hp > 0)
             Console.WriteLine("HP " + monsters[acton - 1].Hp);
         else
@@ -1311,11 +1319,11 @@ internal class Dungeon
         Console.Clear();
         Console.WriteLine(player.Name + "의 더블 스트라이크!");
         Console.WriteLine($"MP {now_mp} -> {player.Mp}");
-        Console.WriteLine("Lv. " + monsters[target1].Lv + "을(를) 맞췄습니다. [데미지 : " + (int)(player.Offense * (0.1 * damage) * 1.5) + "]\n");
+        Console.WriteLine("Lv. " + monsters[target1].Name + "을(를) 맞췄습니다. [데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 1.5) + "]\n");
         Console.WriteLine("Lv. " + monsters[target1].Lv + " " + monsters[target1].Name);
         Console.Write("HP " + monsters[target1].Hp + " -> ");
 
-        monsters[target1].Hp -= (int)(player.Offense * (0.1 * damage) * 1.5);
+        monsters[target1].Hp -= (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 1.5);
         if (monsters[target1].Hp > 0)
             Console.WriteLine("HP " + monsters[target1].Hp);
         else
@@ -1326,11 +1334,11 @@ internal class Dungeon
         Console.WriteLine();
 
         Console.WriteLine(player.Name + "의 공격!");
-        Console.WriteLine("Lv. " + monsters[target2].Name + "을(를) 맞췄습니다. [데미지 : " + (int)(player.Offense * (0.1 * damage) * 1.5) + "]\n");
+        Console.WriteLine("Lv. " + monsters[target2].Name + "을(를) 맞췄습니다. [데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 1.5) + "]\n");
         Console.WriteLine("Lv. " + monsters[target2].Lv + " " + monsters[target2].Name);
         Console.Write("HP " + monsters[target2].Hp + " -> ");
 
-        monsters[target2].Hp -= (int)(player.Offense * (0.1 * damage) * 1.5);
+        monsters[target2].Hp -= (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 1.5);
         if (monsters[target2].Hp > 0)
             Console.WriteLine("HP " + monsters[target2].Hp);
         else
@@ -1347,11 +1355,11 @@ internal class Dungeon
         if (player.Hp > 0)
         {
             Console.WriteLine("Lv. " + monster.Lv + " " + monster.Name + "의 공격!");
-            Console.WriteLine(player.Name + "을(를) 맞췄습니다. [데미지 : " + monster.Offense + "]");
+            Console.WriteLine($"{player.Name} 을(를) 맞췄습니다. [데미지 :  {(int)Math.Ceiling(monster.Offense - ((player.Defence + player.AddedDefence) * 0.1))}]");
             Console.WriteLine("");
             Console.WriteLine("Lv. " + player.Lv + " " + player.Name);
             Console.Write("HP " + player.Hp + " -> ");
-            player.Hp -= monster.Offense;
+            player.Hp -= (int)Math.Ceiling(monster.Offense - ((player.Defence + player.AddedDefence) * 0.1));
             if (player.Hp > 0)
             {
                 Console.WriteLine(player.Hp);
@@ -1372,11 +1380,26 @@ internal class Dungeon
         Console.WriteLine("Battle!! - Result\n");
         if (player.Hp > 0)
         {
+            // 몬스터로 얻은 총 경험치 계산
+            int totalExpGained = monsters.Sum(monster => monster.Lv);
+            player.Exp += totalExpGained;
+
+            // 레벨업 확인
+            while (player.Exp >= player.ExpToLevelUp)
+            {
+                player.Exp -= player.ExpToLevelUp;
+                player.Lv++;
+                player.Offense += 1;
+                player.Defence += 1;
+                player.ExpToLevelUp = CalculateExpForNextLevel(player.Lv);
+            }
             Console.WriteLine("Victory\n");
             Console.WriteLine($"던전에서 몬스터 {monsters.Count}마리를 잡았습니다.\n");
-            Console.WriteLine($"Lv.{player.Lv} {player.Name}");
+            Console.WriteLine($"[캐릭터 정보]\n");
+            Console.WriteLine($"Lv.{player.Lv} {player.Name} -> Lv.{player.Lv + 1} {player.Name}\n");
             Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
             Console.WriteLine($"HP {max_mp} -> {player.Mp}\n");
+            Console.WriteLine($"exp {player.Exp - totalExpGained} -> {player.Exp}\n");
         }
         else
         {
@@ -1395,5 +1418,17 @@ internal class Dungeon
         Console.Clear();
         Program.Start();
     }
+
+    int CalculateExpForNextLevel(int currentLevel)
+    {
+		return currentLevel switch
+		{
+			1 => 10,
+			2 => 35,
+			3 => 65,
+			4 => 100,
+			
+		};
+	}
 }
 
