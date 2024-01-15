@@ -8,6 +8,7 @@ using static sparta_dungeon.Inventory;
 using sparta_dungeon;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel;
 
 namespace sparta_dungeon
 {
@@ -133,11 +134,12 @@ namespace sparta_dungeon
             Console.WriteLine("1. 상태 보기");
             Console.WriteLine("2. 인벤토리");
             Console.WriteLine("3. 상점");
-            Console.WriteLine("4. 전투 시작");
+            Console.WriteLine("4. 던전 입장");
+            Console.WriteLine("     ---     ");
             Console.WriteLine("5. 게임 저장");
             Console.WriteLine("6. 게임 불러오기");
             Console.ResetColor();
-            Console.WriteLine("\n-----------------------------------------------------------------------");
+            Console.WriteLine("\n--------------------------------------------------------------------");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
             int acton = CheckInput(1, 6);
@@ -166,7 +168,7 @@ namespace sparta_dungeon
                 }
                 else if (acton == 4)
                 {
-                    dungeon.EnterDungeon();
+                    dungeon.StageSelect();
                     break;
                 }
                 else if (acton == 5)
@@ -200,6 +202,7 @@ namespace sparta_dungeon
         }
         static void LoadGameData()
         {
+            //Json
             string _playerFileName = "playerInfo.json";
             string _itemFileName = "itemList.json";
             // 데이터 경로 불러오기. (C드라이브, Documents)
@@ -212,7 +215,7 @@ namespace sparta_dungeon
                 string _playerJson = File.ReadAllText(_playerFilePath);
                 player = JsonConvert.DeserializeObject<Character>(_playerJson);
                 Console.ForegroundColor = ConsoleColor.Red;
-                SlowText("플레이어 데이터를 불러왔습니다.", 50);
+                SlowText($"플레이어({player.Name}) 데이터를 불러왔습니다.", 50);
                 Thread.Sleep(600);
                 Console.ResetColor();
             }
@@ -944,34 +947,35 @@ namespace sparta_dungeon
         }
     }
 }
-        public class Monster
-        {
-            public string Name;
-            public int Lv;
-            public int Hp;
-            public int Offense;
-            public int Defense;
-            public string Desc;//description(변수명)
 
-            public List<Monster> monsters;
-            public void Monsters()
-            {
-                monsters = new List<Monster>();
-            }
-            public void Add(Monster monster)
-            {
-                monster.Add(monster);
-            }
-            public Monster(string name, int level, int hp, int offense, int defense, string desc)
-            {
-                Name = name;
-                Lv = level;
-                Hp = hp;
-                Offense = offense;
-                Defense = defense;
-                Desc = desc;
-            }
-        }
+public class Monster
+{
+    public string Name;
+    public int Lv;
+    public int Hp;
+    public int Offense;
+    public int Defense;
+    public string Desc;//description(변수명)
+
+    public List<Monster> monsters;
+    public void Monsters()
+    {
+        monsters = new List<Monster>();
+    }
+    public void Add(Monster monster)
+    {
+        monster.Add(monster);
+    }
+    public Monster(string name, int level, int hp, int offense, int defense, string desc)
+    {
+        Name = name;
+        Lv = level;
+        Hp = hp;
+        Offense = offense;
+        Defense = defense;
+        Desc = desc;
+    }
+}
 
 internal class Dungeon
 {
@@ -990,25 +994,94 @@ internal class Dungeon
         this.player = player;
         monsters = new List<Monster>();
     }
-    public void monsterRewpawn()
+    public void Stage1()
     {
         monsters.Clear();
         Monster minion = new Monster("미니언", 2, 15, 10, 0, "나약한 미니언이다.");
         Monster voidinsect = new Monster("공허충", 3, 20, 15, 1, "공허충입니다.");
         Monster cannonminion = new Monster("대포미니언", 4, 30, 20, 3, "대포미니언입니다.");
-        
-        monsters.Add(voidinsect);
+
         monsters.Add(minion);
+        monsters.Add(voidinsect);
         monsters.Add(cannonminion);
 
         monsters = monsters.OrderBy(monster => random.Next(-1, 1)).ToList();
     }
-
-    public void EnterDungeon()
+    public void Stage2()
     {
-        monsterRewpawn();
-        BattleStart();
+        monsters.Clear();
+        Monster goblin = new Monster("고블린", 3, 20, 10, 0, "멍청하지만 지성이 있는 고블린입니다.");
+        Monster warg = new Monster("와르그", 3, 20, 15, 0, "고블린들이 키우는 와르그입니다.");
+        Monster hobgoblin = new Monster("홉고블린", 4, 30, 15, 1, "고블린들을 지배하는 홉고블린입니다.");
+        Monster ogre = new Monster("오우거", 5, 50, 20, 5, "고블린들의 용병으로 일하는 오우거입니다.");
+
+        monsters.Add(goblin);
+        monsters.Add(warg);
+        monsters.Add(hobgoblin);
+        monsters.Add(ogre);
+
+        monsters = monsters.OrderBy(monster => random.Next(-1, 2)).ToList();
     }
+    public void Stage3()
+    {
+        monsters.Clear();
+
+        int choHealth = 350;
+        int gallHealth = 350;
+
+        Monster cho = new Monster("초", 6, choHealth, 20, 0, "한 몸을 공유하는 두 형제입니다.");
+        Monster gall = new Monster("갈", 6, gallHealth, 35, 0, "두 형제 중 마법사입니다.");
+
+        monsters.Add(cho);
+        monsters.Add(gall);
+    }
+
+    public void StageSelect()
+    {
+        Console.Clear();
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("\n===============");
+        Console.WriteLine("||난이도 선택||");
+        Console.WriteLine("===============\n");
+        Console.ResetColor();
+
+        Console.WriteLine("스파르타 던전에 입장하십니다.\n");
+
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("0. 나가기");
+        Console.WriteLine("1. 소환사의 협곡(쉬움)");
+        Console.WriteLine("2. 고블린 캠프(보통)");
+        Console.WriteLine("3. 시공의 폭풍(어려움)");
+        Console.ResetColor();
+
+        Console.WriteLine("\n------------------------------------------");
+        Console.WriteLine("원하시는 던전 난이도를 입력해주세요.");
+        Console.WriteLine(">>");
+
+        while (true)
+        {
+            int acton = Program.CheckInput(0, 3);
+
+            if (acton == 0)
+            {
+                Program.Start();
+            }
+            else if (acton == 1)
+            {
+                Stage1();
+            }
+            else if (acton == 2)
+            {
+                Stage2();
+            }
+            else if (acton == 3)
+            {
+                Stage3();
+            }
+            BattleStart();
+        }
+    }
+
     public void BattleStart()
     {
         while (player.Hp > 0 && player.Hp > 0 && monsters.Any(m => m.Hp > 0))
