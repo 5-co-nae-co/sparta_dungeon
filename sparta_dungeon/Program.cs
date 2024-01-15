@@ -414,8 +414,7 @@ namespace sparta_dungeon
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("이미 구매한 상품 입니다.");
                         Console.ResetColor();
-                        Console.WriteLine("확인을 위해 아무 키나 눌러주세요");
-                        Console.ReadLine();
+                        Thread.Sleep(700);
                     }
                     else if (inputItem.saleGold <= player.Gold)
                     {
@@ -429,8 +428,7 @@ namespace sparta_dungeon
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Gold가 부족합니다.");
                         Console.ResetColor();
-                        Console.WriteLine("확인을 위해 아무 키나 눌러주세요");
-                        Console.ReadLine();
+                        Thread.Sleep(700);
                     }
                     ShopBuy();
                 }
@@ -675,8 +673,8 @@ namespace sparta_dungeon
         {
             if (!isEquipedArmor)
             {
-                EquipedWeapon = item;
-                isEquipedWeapon = true;
+                EquipedArmor = item;
+                isEquipedArmor = true;
             }
             else if (isEquipedArmor)
             {
