@@ -1,12 +1,11 @@
-﻿using sparta_dungeon;
-using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipes;
 using System.Net.Security;
 using System.Numerics;
 using System.Xml.Linq;
 using static sparta_dungeon.Inventory;
+using sparta_dungeon;
 
 namespace sparta_dungeon
 {
@@ -519,7 +518,7 @@ namespace sparta_dungeon
             SlowText(" . . . . . ", 150);
         }
     }
-
+    
     class Character
     {
         public int Lv;
@@ -1166,7 +1165,7 @@ internal class Dungeon
         Console.Clear();
         Console.WriteLine(player.Name + "의 더블 스트라이크!");
         Console.WriteLine($"MP {now_mp} -> {player.Mp}");
-        Console.WriteLine("Lv. " + monsters[target1].Lv + "을(를) 맞췄습니다. [데미지 : " + (int)(player.Offense * (0.1 * damage)) + "]\n");
+        Console.WriteLine("Lv. " + monsters[target1].Lv + "을(를) 맞췄습니다. [데미지 : " + (int)(player.Offense * (0.1 * damage) * 1.5) + "]\n");
         Console.WriteLine("Lv. " + monsters[target1].Lv + " " + monsters[target1].Name);
         Console.Write("HP " + monsters[target1].Hp + " -> ");
 
@@ -1181,7 +1180,7 @@ internal class Dungeon
         Console.WriteLine();
 
         Console.WriteLine(player.Name + "의 공격!");
-        Console.WriteLine("Lv. " + monsters[target2].Name + "을(를) 맞췄습니다. [데미지 : " + (int)(player.Offense * (0.1 * damage)) + "]\n");
+        Console.WriteLine("Lv. " + monsters[target2].Name + "을(를) 맞췄습니다. [데미지 : " + (int)(player.Offense * (0.1 * damage) * 1.5) + "]\n");
         Console.WriteLine("Lv. " + monsters[target2].Lv + " " + monsters[target2].Name);
         Console.Write("HP " + monsters[target2].Hp + " -> ");
 
