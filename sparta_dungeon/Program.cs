@@ -530,6 +530,8 @@ namespace sparta_dungeon
         public int Gold;
         public int AddedOffense; //아이템 추가 공격력
         public int AddedDefence; //아이템 추가 방어력
+        public int Exp {  get; set; }
+        public int ExpToLevelUp {  get; set; }
 
         public Item EquipedWeapon;
         public Item EquipedArmor;
@@ -546,6 +548,8 @@ namespace sparta_dungeon
             Hp = hp;
             Mp = mp;
             Gold = gold;
+            Exp = 0;
+            ExpToLevelUp = 10;
         }
 
         public bool CanEquipItem(Item item)   // 아이템이 착용 가능한지 확인
@@ -1224,11 +1228,26 @@ internal class Dungeon
         Console.WriteLine("Battle!! - Result\n");
         if (player.Hp > 0)
         {
+            // 몬스터로 얻은 총 경험치 계산
+            int totalExpGained = monsters.Sum(monster => monster.Lv);
+            player.Exp += totalExpGained;
+
+            // 레벨업 확인
+            while (player.Exp >= player.ExpToLevelUp)
+            {
+                player.Exp -= player.ExpToLevelUp;
+                player.Lv++;
+                player.Offense += 1;
+                player.Defence += 1;
+                player.ExpToLevelUp = CalculateExpForNextLevel(player.Lv);
+            }
             Console.WriteLine("Victory\n");
             Console.WriteLine($"던전에서 몬스터 {monsters.Count}마리를 잡았습니다.\n");
-            Console.WriteLine($"Lv.{player.Lv} {player.Name}");
+            Console.WriteLine($"[캐릭터 정보]\n");
+            Console.WriteLine($"Lv.{player.Lv} {player.Name} -> Lv.{player.Lv + 1} {player.Name}\n");
             Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
             Console.WriteLine($"HP {max_mp} -> {player.Mp}\n");
+            Console.WriteLine($"exp {player.Exp - totalExpGained} -> {player.Exp}\n");
         }
         else
         {
@@ -1247,5 +1266,17 @@ internal class Dungeon
         Console.Clear();
         Program.Start();
     }
+
+    int CalculateExpForNextLevel(int currentLevel)
+    {
+		return currentLevel switch
+		{
+			1 => 10,
+			2 => 35,
+			3 => 65,
+			4 => 100,
+			
+		};
+	}
 }
 
