@@ -36,15 +36,19 @@ namespace sparta_dungeon
             inventory.Add(OldSword);
             Item BronzeAxe = new Item("청동 도끼", 15, 0, "어디선가 사용됐던거 같은 도끼입니다.", false, false, 600, 0);
             inventory.Add(BronzeAxe);
-            Item SpartaSpear = new Item("스파르타 창", 30, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 3000, 0);
+            Item SpartaSpear = new Item("스파르타 창", 30, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 3000, 1);
             inventory.Add(SpartaSpear);
+            Item SilverFang = new Item("은빛 송곳니", 40, 0, "숙련된 도적들이 사용한다는 무기입니다.", false, false, 3000, 2);
+            inventory.Add(SilverFang);
+            Item ManaBow = new Item("마법의 활", 50, 0, "마법의 힘이 깃든 활입니다.", false, false, 3000, 3);
+            inventory.Add(ManaBow);
 
             //방어구
             Item BeggarsCloth = new Item("거렁뱅이의 옷", 0, 5, "촌장의 마음보다 넓은 구멍이 뚫려있는 더러운 옷입니다.", false, false, 100, 0);
             inventory.Add(BeggarsCloth);
             Item TrainingArmor = new Item("수련자갑옷", 0, 10, "수련에 도움을 주는 헐렁한 갑옷입니다.", false, false, 400, 0);
             inventory.Add(TrainingArmor);
-            Item IronArmor = new Item("무쇠 갑옷", 0, 15, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 600, 0);
+            Item IronArmor = new Item("무쇠 갑옷", 0, 15, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 600, 1);
             inventory.Add(IronArmor);
             Item SpartaArmor = new Item("스파르타 갑옷", 0, 30, "스파르타 전사들이 입던 갑옷입니다.", false, false, 3000, 0);
             inventory.Add(SpartaArmor);
@@ -266,6 +270,7 @@ namespace sparta_dungeon
             Console.ResetColor();
             ColorText($"체력 : {player.Hp}\n\n", ConsoleColor.DarkGreen);
             ColorText($"Gold : {player.Gold}\n\n", ConsoleColor.DarkYellow);
+            Console.WriteLine($"경험치 : {player.Exp} / {player.ExpToLevelUp}\n");
             ColorText("0. 나가기\n\n", ConsoleColor.Yellow);
             Console.WriteLine("-----------------------------------------------------------------------");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
@@ -718,9 +723,9 @@ namespace sparta_dungeon
                         Console.WriteLine("선택한 직업은 도적입니다.");
                         character.Lv = 1;
                         character.Job = "도적";
-                        character.Offense = 20;
+                        character.Offense = 15;
                         character.Defence = 5;
-                        character.Hp = 100;
+                        character.Hp = 150;
                         character.Mp = 100;
                         character.Gold = 1500;
                         Character.JobType = 2;
@@ -729,9 +734,9 @@ namespace sparta_dungeon
                         Console.WriteLine("선택한 직업은 궁수입니다.");
                         character.Lv = 1;
                         character.Job = "궁수";
-                        character.Offense = 15;
+                        character.Offense = 20;
                         character.Defence = 5;
-                        character.Hp = 150;
+                        character.Hp = 100;
                         character.Mp = 100;
                         character.Gold = 1500;
                         Character.JobType = 3;
