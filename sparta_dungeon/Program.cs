@@ -18,7 +18,11 @@ namespace sparta_dungeon
         static Character player;
         static Inventory inventory = new Inventory();
         static Dungeon dungeon;
-        static void settings()
+		public static Inventory GetInventory()
+		{
+			return inventory;
+		}
+		static void settings()
         {
             player = new Character(1, "", "", 0, 0, 0, 0, 0);        //Charater 객체 생성
             player.SelectName(player);                            //플레이어 이름 설정
@@ -1054,8 +1058,11 @@ public class Monster
     public int Offense;
     public int Defense;
     public string Desc;//description(변수명)
+	public int ExpReward { get; set; }
+	public int GoldReward { get; set; }
+	public List<Item> ItemRewards { get; set; }
 
-    public List<Monster> monsters;
+	public List<Monster> monsters;
     public void Monsters()
     {
         monsters = new List<Monster>();
@@ -1064,7 +1071,7 @@ public class Monster
     {
         monster.Add(monster);
     }
-    public Monster(string name, int level, int hp, int offense, int defense, string desc)
+    public Monster(string name, int level, int hp, int offense, int defense, string desc, int expReward, int goldReward, List<Item> itemRewards)
     {
         Name = name;
         Lv = level;
@@ -1072,7 +1079,11 @@ public class Monster
         Offense = offense;
         Defense = defense;
         Desc = desc;
-    }
+		ExpReward = expReward;
+		GoldReward = goldReward;
+		ItemRewards = itemRewards;
+
+	}
 }
 
 internal class Dungeon
@@ -1096,44 +1107,56 @@ internal class Dungeon
 
     public void Stage1()
     {
-        monsters.Clear();
-        Monster minion = new Monster("미니언", 2, 15, 10, 0, "나약한 미니언이다.");
-        Monster voidinsect = new Monster("공허충", 3, 20, 15, 1, "공허충입니다.");
-        Monster cannonminion = new Monster("대포미니언", 4, 30, 20, 3, "대포미니언입니다.");
+		monsters.Clear();
+		Item healingPotion = new Item("치유 물약", -1, -1, "체력을 30 회복 시켜주는 물약 입니다.", false, false, 300, 0);
+		List<Item> stage1Rewards = new List<Item>() { healingPotion };
 
-        monsters.Add(minion);
+		Monster minion = new Monster("미니언", 2, 15, 10, 0, "나약한 미니언이다.", 10, 100, stage1Rewards);
+		Monster voidinsect = new Monster("공허충", 3, 20, 15, 1, "공허충입니다.", 15, 150, stage1Rewards);
+		Monster cannonminion = new Monster("대포미니언", 4, 30, 20, 3, "대포미니언입니다.", 20, 200, stage1Rewards);
+
+		monsters.Add(minion);
         monsters.Add(voidinsect);
         monsters.Add(cannonminion);
 
         monsters = monsters.OrderBy(monster => random.Next(-1, 1)).ToList();
     }
-    public void Stage2()
-    {
-        monsters.Clear();
-        Monster goblin = new Monster("고블린", 3, 20, 10, 0, "멍청하지만 지성이 있는 고블린입니다.");
-        Monster warg = new Monster("와르그", 3, 20, 15, 0, "고블린들이 키우는 와르그입니다.");
-        Monster hobgoblin = new Monster("홉고블린", 4, 30, 15, 1, "고블린들을 지배하는 홉고블린입니다.");
-        Monster ogre = new Monster("오우거", 5, 50, 20, 5, "고블린들의 용병으로 일하는 오우거입니다.");
+	public void Stage2()
+	{
+		monsters.Clear();
+		Item ironArmor = new Item("무쇠 갑옷", 0, 15, "무쇠로 만들어져 튼튼한 갑옷입니다.", false, false, 600, 0);
+		List<Item> stage2Rewards = new List<Item>() { ironArmor };
 
-        monsters.Add(goblin);
-        monsters.Add(warg);
-        monsters.Add(hobgoblin);
-        monsters.Add(ogre);
+		Monster goblin = new Monster("고블린", 3, 20, 10, 0, "멍청하지만 지성이 있는 고블린입니다.", 20, 200, stage2Rewards);
+		Monster warg = new Monster("와르그", 3, 20, 15, 0, "고블린들이 키우는 와르그입니다.", 25, 250, stage2Rewards);
+		Monster hobgoblin = new Monster("홉고블린", 4, 30, 15, 1, "고블린들을 지배하는 홉고블린입니다.", 30, 300, stage2Rewards);
+		Monster ogre = new Monster("오우거", 5, 50, 20, 5, "고블린들의 용병으로 일하는 오우거입니다.", 35, 350, stage2Rewards);
 
-        monsters = monsters.OrderBy(monster => random.Next(-1, 2)).ToList();
-    }
-    public void Stage3()
-    {
-        monsters.Clear();
+		monsters.Add(goblin);
+		monsters.Add(warg);
+		monsters.Add(hobgoblin);
+		monsters.Add(ogre);
 
-        Monster cho = new Monster("초", 6, 350, 20, 0, "한 몸을 공유하는 두 형제입니다.");
-        Monster gall = new Monster("갈", 6, 350, 35, 0, "두 형제 중 마법사입니다.");
+		monsters = monsters.OrderBy(monster => random.Next(-1, 2)).ToList();
+	}
 
-        monsters.Add(cho);
-        monsters.Add(gall);
-    }
+	public void Stage3()
+	{
+		monsters.Clear();
+		// 스파르타 창과 갑옷 인스턴스 생성
+		Item spartaSpear = new Item("스파르타 창", 30, 0, "스파르타 전사들이 사용했다는 전설의 창입니다.", false, false, 3000, 0);
+		Item spartaArmor = new Item("스파르타 갑옷", 0, 30, "스파르타 전사들이 입던 갑옷입니다.", false, false, 3000, 0);
+		List<Item> stage3Rewards = new List<Item>() { spartaArmor, spartaSpear };
 
-    public void StageSelect()
+		Monster cho = new Monster("초", 6, 350, 20, 0, "한 몸을 공유하는 두 형제입니다.", 40, 400, stage3Rewards);
+		Monster gall = new Monster("갈", 6, 350, 35, 0, "두 형제 중 마법사입니다.", 45, 450, stage3Rewards);
+
+		monsters.Add(cho);
+		monsters.Add(gall);
+	}
+
+
+	public void StageSelect()
     {
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Green;
@@ -1498,44 +1521,75 @@ internal class Dungeon
         Console.WriteLine("엔터를 입력하세요");
         Console.ReadLine();
     }
-    public void Result()
-    {
-        Console.Clear();
-        Console.WriteLine("Battle!! - Result\n");
-        if (player.Hp > 0)
-        {
-            // 몬스터로 얻은 총 경험치 계산
-            int totalExpGained = monsters.Sum(monster => monster.Lv);
-            player.Exp += totalExpGained;
+	public void Result()
+	{
+		Console.Clear();
+		Console.WriteLine("Battle!! - Result\n");
+		if (player.Hp > 0)
+		{
+			int totalExpGained = 0;
+			int totalGoldGained = 0;
+			List<Item> itemsGained = new List<Item>();
 
-            // 레벨업 확인
-            while (player.Exp >= player.ExpToLevelUp)
-            {
-                player.Exp -= player.ExpToLevelUp;
-                player.Lv++;
-                player.Offense += 1;
-                player.Defence += 1;
-                player.ExpToLevelUp = CalculateExpForNextLevel(player.Lv);
-            }
-            Console.WriteLine("Victory\n");
-            Console.WriteLine($"던전에서 몬스터 {monsters.Count}마리를 잡았습니다.\n");
-            Console.WriteLine($"[캐릭터 정보]\n");
-            Console.WriteLine($"Lv.{player.Lv} {player.Name} -> Lv.{player.Lv + 1} {player.Name}\n");
-            Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
-            Console.WriteLine($"HP {max_mp} -> {player.Mp}\n");
-            Console.WriteLine($"exp {player.Exp - totalExpGained} -> {player.Exp}\n");
-        }
-        else
-        {
-            Console.WriteLine("You Lose\n");
-            Console.WriteLine($"Lv.{player.Lv} {player.Name}");
-            Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
-            Console.WriteLine($"MP {max_mp} -> {player.Mp}\n");
-        }
-        Console.WriteLine("0. 다음\n");
+			foreach (Monster monster in monsters)
+			{
+				totalExpGained += monster.ExpReward;
+				totalGoldGained += monster.GoldReward;
 
-        Console.WriteLine(">>");
-        Console.WriteLine("엔터를 입력하면 마을로 이동합니다.");
+				// 스파르타 창과 갑옷이 5% 확률로 드랍되게 설정
+				if (random.Next(100) < 5) // 5% 확률
+				{
+					Item dropItem = random.Next(2) == 0 ? new Item("스파르타 창", 30, 0, "전설의 창", false, false, 3000, 0) :
+														  new Item("스파르타 갑옷", 0, 30, "전설의 갑옷", false, false, 3000, 0);
+					itemsGained.Add(dropItem);
+				}
+
+
+				itemsGained.AddRange(monster.ItemRewards);
+			}
+
+			player.Exp += totalExpGained;
+			player.Gold += totalGoldGained;
+			foreach (Item item in itemsGained)
+			{
+				Program.GetInventory().inventoryList.Add(item);
+			}
+
+			// 레벨업 확인
+			while (player.Exp >= player.ExpToLevelUp)
+			{
+				player.Exp -= player.ExpToLevelUp;
+				player.Lv++;
+				player.Offense += 1; // 혹은 레벨업에 따른 적절한 스탯 증가
+				player.Defence += 1; // 혹은 레벨업에 따른 적절한 스탯 증가
+				player.ExpToLevelUp = CalculateExpForNextLevel(player.Lv);
+			}
+
+			Console.WriteLine("Victory\n");
+			Console.WriteLine($"던전에서 몬스터 {monsters.Count}마리를 잡았습니다.\n");
+			Console.WriteLine($"[캐릭터 정보]\n");
+			Console.WriteLine($"현재레벨: Lv.{player.Lv} {player.Name} -> 다음레벨: Lv.{player.Lv + 1} {player.Name}\n");
+			Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
+			Console.WriteLine($"MP {max_mp} -> {player.Mp}\n");
+			Console.WriteLine($"exp {player.Exp - totalExpGained} -> {player.Exp}\n");
+
+			Console.WriteLine("[획득 아이템]");
+			foreach (Item item in itemsGained)
+			{
+				Console.WriteLine($"{item.Name} - 1");
+			}
+		}
+		else
+		{
+			Console.WriteLine("You Lose\n");
+			Console.WriteLine($"Lv.{player.Lv} {player.Name}");
+			Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
+			Console.WriteLine($"MP {max_mp} -> {player.Mp}\n");
+		}
+
+		Console.WriteLine("0. 다음\n");
+		Console.WriteLine(">>");
+		Console.WriteLine("엔터를 입력하면 마을로 이동합니다.");
 
         //일단 종료하지는 않고 마을로 이동함(회복아이템?)
         Console.ReadLine();
