@@ -30,7 +30,7 @@ namespace sparta_dungeon
             dungeon = new Dungeon(player);
 
             //소모품
-            Item HealthPotion = new Item("치유 물약", -1, -1, "체력을 30 회복 시켜주는 물약 입니다.", false, false, 300, 0);
+            Item HealthPotion = new Item("치유 물약", -1, -1, "체력을 60 회복 시켜주는 물약 입니다.", false, false, 300, 0);
             inventory.Add(HealthPotion);
 
             //무기
@@ -162,13 +162,15 @@ namespace sparta_dungeon
             Console.WriteLine("3. 상점");
             Console.WriteLine("4. 던전 입장");
             Console.WriteLine("     ---     ");
-            Console.WriteLine("5. 게임 저장");
-            Console.WriteLine("6. 게임 불러오기");
+            Console.WriteLine("5. 휴식하기 - 500G");
+            Console.WriteLine("     ---     ");
+            Console.WriteLine("6. 게임 저장");
+            Console.WriteLine("7. 게임 불러오기");
             Console.ResetColor();
             Console.WriteLine("\n--------------------------------------------------------------------");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
-            int acton = CheckInput(1, 6);
+            int acton = CheckInput(1, 7);
             while (true)
             {
                 if (acton == 1)
@@ -227,6 +229,11 @@ namespace sparta_dungeon
                 }
                 else if (acton == 5)
                 {
+                    GetRest();
+                    break;
+                }
+                else if (acton == 6)
+                {
                     // Json
                     string _fileName = "playerInfo.json";
                     string _itemFileName = "itemList.json";
@@ -250,7 +257,7 @@ namespace sparta_dungeon
                     Start();
                     break;
                 }
-                else if (acton == 6)
+                else if (acton == 7)
                 {
                     LoadGameData();
                     Start();
@@ -309,6 +316,65 @@ namespace sparta_dungeon
             }
             dungeon = new Dungeon(player);
             FindEquippedItem();
+        }
+        static void GetRest()
+        {
+            string innArt = @"
+
+
+                  _      ()              ()      _
+                 / \     ||______________||     / \
+                /___\    |                |    /___\
+                  |      |      ~@@~      |      |
+                 (_)     |_______  _______|     (_)
+              ___/_\___  {_______}{_______}  ___/_\___
+               |__~__|   %%%%%%%%%%%%%%%%%%   |__~__|
+            ___|_____|__%%%%%%%%%%%%%%%%%%%%__|_____|___
+               |     | %%%%%%%%%%%%%%%%%%%%%% |     |
+                `=====%%%%%%%%%%%%%%%%%%%%%%%%=====`
+               `=====%%%%%%%%%%%%%%%%%%%%%%%%%%=====`
+              `=====%%%%%%%%%%%%%%%%%%%%%%%%%%%%=====`
+             `=====/||||||||||||||||||||||||||||\=====`
+            `======||||||||||||||||||||||||||||||======`
+           `=======|||||||||||||||||||||||||||lc|=======`
+          `==============================================`
+         `================================================`
+        `==================================================`
+       `====================================================`
+";
+            if (player.Gold >= 500)
+            {
+                Console.Clear();
+                Console.WriteLine(innArt);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                SlowText("\n\n        당신은 여관에서 휴식을 취합니다 . . . . . . . .", 80);
+                Console.ResetColor();
+
+                if (player.Job == "전사")
+                {
+                    player.Hp = 200;
+                    player.Mp = 100;
+                }
+                else if (player.Job == "도적")
+                {
+                    player.Hp = 100;
+                    player.Mp = 100;
+                }
+                else if (player.Job == "궁수")
+                {
+                    player.Hp = 150;
+                    player.Mp = 100;
+                }
+                Start();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                SlowText("\n휴식하기에 돈이 부족합니다!\n", 50);
+                Thread.Sleep(600);
+                Console.ResetColor();
+                Start();
+            }
         }
 
         static void State()
@@ -607,7 +673,7 @@ namespace sparta_dungeon
                         inventory.inventoryList.Remove(inputItem);
                         player.Gold += (inputItem.saleGold * 85 / 100);
                     }
-                    else if (inputItem.isBuy)
+                    else
                     {
                         if (inputItem == player.EquipedWeapon) //판매 전에 장비 상태 해체
                         {
@@ -871,7 +937,7 @@ ___|_______|__[ == ==]/.::::::;;;:::::::::::::::;;;:::::::.\[=  == ]___|_____";
                     Program.ColorText("치유 물약은 최대 체력 이상으로 회복 되지 않습니다.\n", ConsoleColor.Red);
                     Thread.Sleep(800);
                 }
-                Hp += 30;
+                Hp += 60;
                 if (Job == "전사" && Hp > 200)
                 {
                     Hp = 200;
@@ -889,7 +955,7 @@ ___|_______|__[ == ==]/.::::::;;;:::::::::::::::;;;:::::::.\[=  == ]___|_____";
                 }
                 else
                 {
-                    Program.ColorText("30의 체력을 회복 했습니다.\n", ConsoleColor.Red);
+                    Program.ColorText("60의 체력을 회복 했습니다.\n", ConsoleColor.Red);
                     Thread.Sleep(800);
                 }
             }
@@ -1640,8 +1706,13 @@ internal class Dungeon
 	public void Result()
 	{
 		Console.Clear();
-		Console.WriteLine("Battle!! - Result\n");
-		if (player.Hp > 0)
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine("                                      ====================");
+        Console.WriteLine("                                      ||던전 전투 - 결과||");
+        Console.WriteLine("                                      ====================");
+        Console.ResetColor();
+
+        if (player.Hp > 0)
 		{
 			int totalExpGained = 0;
 			int totalGoldGained = 0;
@@ -1681,34 +1752,35 @@ internal class Dungeon
 				player.ExpToLevelUp = CalculateExpForNextLevel(player.Lv);
 			}
 
-			Console.WriteLine("Victory\n");
-			Console.WriteLine($"던전에서 몬스터 {monsters.Count}마리를 잡았습니다.\n");
-			Console.WriteLine($"[캐릭터 정보]\n");
-			Console.WriteLine($"현재레벨: Lv.{player.Lv} {player.Name} -> 다음레벨: Lv.{player.Lv + 1} {player.Name}\n");
-			Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
-			Console.WriteLine($"MP {max_mp} -> {player.Mp}\n");
-			Console.WriteLine($"exp {player.Exp - totalExpGained} -> {player.Exp}\n");
+            Console.WriteLine("\n                                            Victory\n\n");
+			Console.WriteLine($"                         던전에서 몬스터 {monsters.Count}마리를 잡았습니다.\n");
+			Program.ColorText($"                                       [캐릭터 정보]\n\n", ConsoleColor.Yellow);
+			Console.WriteLine($"                         현재레벨: Lv.{player.Lv} {player.Name} -> 다음레벨: Lv.{player.Lv + 1} {player.Name}\n");
+			Console.WriteLine($"                         HP {max_hp} -> {player.Hp}\n");
+			Console.WriteLine($"                         MP {max_mp} -> {player.Mp}\n");
+			Console.WriteLine($"                         exp {player.Exp - totalExpGained} -> {player.Exp}\n");
 
-			Console.WriteLine("[획득 아이템]");
+			Program.ColorText("                                       [획득 아이템]\n", ConsoleColor.Green);
 			foreach (Item item in itemsGained)
 			{
-				Console.WriteLine($"{item.Name} - 1");
+				Console.WriteLine($"                         {item.Name} - 1");
 			}
 		}
 		else
 		{
-			Console.WriteLine("You Lose\n");
-			Console.WriteLine($"Lv.{player.Lv} {player.Name}");
-			Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
-			Console.WriteLine($"MP {max_mp} -> {player.Mp}\n");
+            Console.WriteLine("\n                                             Lost\n\n");
+			Console.WriteLine($"                         Lv.{player.Lv} {player.Name}");
+			Console.WriteLine($"                         HP {max_hp} -> {player.Hp}\n");
+			Console.WriteLine($"                         MP {max_mp} -> {player.Mp}\n");
 		}
 
-		Console.WriteLine("0. 다음\n");
-		Console.WriteLine(">>");
-		Console.WriteLine("엔터를 입력하면 마을로 이동합니다.");
+		Console.WriteLine("                         0. 다음\n");
+		Console.WriteLine("                         >>");
+		Console.WriteLine("                         엔터를 입력하면 마을로 이동합니다.");
 
         //일단 종료하지는 않고 마을로 이동함(회복아이템?)
         Console.ReadLine();
+        Console.SetCursorPosition(37, Console.CursorTop);
         Console.Clear();
         Program.Start();
     }
