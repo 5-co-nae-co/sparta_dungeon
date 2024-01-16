@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System;
+using WMPLib;
 
 namespace sparta_dungeon
 {
@@ -18,11 +19,13 @@ namespace sparta_dungeon
         static Character player;
         static Inventory inventory = new Inventory();
         static Dungeon dungeon;
-		public static Inventory GetInventory()
+        public static Inventory GetInventory()
 		{
 			return inventory;
 		}
-		static void settings()
+
+        static WindowsMediaPlayer bgm = new WindowsMediaPlayer();
+        static void settings()
         {
             player = new Character(1, "", "", 0, 0, 0, 0, 0);        //Charater 객체 생성
             player.SelectName(player);                            //플레이어 이름 설정
@@ -30,7 +33,7 @@ namespace sparta_dungeon
             dungeon = new Dungeon(player);
 
             //소모품
-            Item HealthPotion = new Item("치유 물약", -1, -1, "체력을 30 회복 시켜주는 물약 입니다.", false, false, 300, 0);
+            Item HealthPotion = new Item("치유 물약", -1, -1, "체력을 60 회복 시켜주는 물약 입니다.", false, false, 300, 0);
             inventory.Add(HealthPotion);
 
             //무기
@@ -77,8 +80,9 @@ namespace sparta_dungeon
         public static void Main()
         {
             Console.SetWindowSize(105, 43);//시작 화면 크기 고정 코드
+            SoundPlay("shop");
             settings();
-            /*Intro();*/ //Note 테스트 할 때에는 오래걸리니 주석화 한 뒤 진행하세요.
+            Intro(); //Note 테스트 할 때에는 오래걸리니 주석화 한 뒤 진행하세요.
             Start();
         }
         public static void CalcAddedStat() //추가 아이템 스텟을 체크하는 메서드
@@ -162,13 +166,15 @@ namespace sparta_dungeon
             Console.WriteLine("3. 상점");
             Console.WriteLine("4. 던전 입장");
             Console.WriteLine("     ---     ");
-            Console.WriteLine("5. 게임 저장");
-            Console.WriteLine("6. 게임 불러오기");
+            Console.WriteLine("5. 휴식하기 - 500G");
+            Console.WriteLine("     ---     ");
+            Console.WriteLine("6. 게임 저장");
+            Console.WriteLine("7. 게임 불러오기");
             Console.ResetColor();
             Console.WriteLine("\n--------------------------------------------------------------------");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
-            int acton = CheckInput(1, 6);
+            int acton = CheckInput(1, 7);
             while (true)
             {
                 if (acton == 1)
@@ -183,32 +189,32 @@ namespace sparta_dungeon
                 }
                 else if (acton == 3)
                 {
-                    string storeOwner = @"                          ,---.
-                         /    |
-                        /     |
-                       /       |
-                      /        |
-                 ___,'         |
-               <  -'           :
-                `-.__..--'``-,__\_
-                   |o/ ` o,. )_`>
-                   :/ `      ||/)
-                   (_.).__ ,-` |\
-                   /( `.``   ` | :
-                   \'`-.)  `   ; ;
-                   | `        /-<
-                   |     `   /   `.
-   ,-_-..____     /|  `     :__..-'\
-  /,'-.__\\  ``-./ :`       ;       \
-  `\ `\  `\\  \ :  (   `   /  ,   `. \
-    \` \   \\   |  | `    :  :     .\ \
-     \ `\_  ))  :  ;      |  |      ): :
-    (`-.-'\ ||  |\ \   `  ;  ;       | |
-     \-_   `;;._   ( `   /  /_       | |
-      `-.-.// ,'`-._\__ /_,'         ; |
-         \:: :     /     `      ,   /  |
-          || |    (         ,' /   /   |
-          ||                 ,'   /    |";
+                    string storeOwner = @"                              ,--- .
+                             /    |
+                            /     |
+                           /       |
+                          /        |
+                     ___,'Sparta   |
+                   <  -'           :
+                    `-.__..--'``-,__\_
+                       |o/ ` o,. )_`>
+                       :/ `      ||/)
+                       (_.).__ ,-` |\
+                       /( `.``   ` | :
+                       \'`-.)  `   ; ;
+                       | `        /-<
+                       |     `   /   `.
+       ,-_-..____     /|  `     :__..-'\
+      /,'-.__\\  ``-./ :`       ;       \
+      `\ `\  `\\  \ :  (   `   /  ,   `. \
+        \` \   \\   |  | `    :  :     .\ \
+         \ `\_  ))  :  ;      |  |      ): :
+        (`-.-'\ ||  |\ \   `  ;  ;       | |
+         \-_   `;;._   ( `   /  /_       | |
+          `-.-.// ,'`-._\__ /_,'         ; |
+             \:: :     /     `      ,   /  |
+              || |    (         ,' /   /   |
+              ||                 ,'   /    |";
                     Console.Clear();
                     Console.WriteLine();
                     ColorText(storeOwner, ConsoleColor.Cyan);
@@ -226,6 +232,11 @@ namespace sparta_dungeon
                     break;
                 }
                 else if (acton == 5)
+                {
+                    GetRest();
+                    break;
+                }
+                else if (acton == 6)
                 {
                     // Json
                     string _fileName = "playerInfo.json";
@@ -250,7 +261,7 @@ namespace sparta_dungeon
                     Start();
                     break;
                 }
-                else if (acton == 6)
+                else if (acton == 7)
                 {
                     LoadGameData();
                     Start();
@@ -309,6 +320,66 @@ namespace sparta_dungeon
             }
             dungeon = new Dungeon(player);
             FindEquippedItem();
+        }
+        static void GetRest()
+        {
+            string innArt = @"
+
+
+                  _      ()              ()      _
+                 / \     ||______________||     / \
+                /___\    |    스파르타    |    /___\
+                  |      |      여관      |      |
+                 (_)     |_______  _______|     (_)
+              ___/_\___  {_______}{_______}  ___/_\___
+               |__~__|   %%%%%%%%%%%%%%%%%%   |__~__|
+            ___|_____|__%%%%%%%%%%%%%%%%%%%%__|_____|___
+               |     | %%%%%%%%%%%%%%%%%%%%%% |     |
+                `=====%%%%%%%%%%%%%%%%%%%%%%%%=====`
+               `=====%%%%%%%%%%%%%%%%%%%%%%%%%%=====`
+              `=====%%%%%%%%%%%%%%%%%%%%%%%%%%%%=====`
+             `=====/||||||||||||||||||||||||||||\=====`
+            `======||||||||||||||||||||||||||||||======`
+           `=======|||||||||||||||||||||||||||lc|=======`
+          `==============================================`
+         `================================================`
+        `==================================================`
+       `====================================================`
+";
+            if (player.Gold >= 500)
+            {
+                Console.Clear();
+                Console.WriteLine(innArt);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                SlowText("\n\n        당신은 여관에서 휴식을 취합니다 . . . . . . . .", 80);
+                Console.ResetColor();
+                
+                if (player.Job == "전사")
+                {
+                    player.Hp = 200;
+                    player.Mp = 100;
+                }
+                else if (player.Job == "도적")
+                {
+                    player.Hp = 100;
+                    player.Mp = 100;
+                }
+                else if (player.Job == "궁수")
+                {
+                    player.Hp = 150;
+                    player.Mp = 100;
+                }
+                player.Gold -= 500;
+                Start();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                SlowText("\n휴식하기에 돈이 부족합니다!\n", 50);
+                Thread.Sleep(600);
+                Console.ResetColor();
+                Start();
+            }
         }
 
         static void State()
@@ -607,7 +678,7 @@ namespace sparta_dungeon
                         inventory.inventoryList.Remove(inputItem);
                         player.Gold += (inputItem.saleGold * 85 / 100);
                     }
-                    else if (inputItem.isBuy)
+                    else
                     {
                         if (inputItem == player.EquipedWeapon) //판매 전에 장비 상태 해체
                         {
@@ -640,7 +711,7 @@ namespace sparta_dungeon
  |----/\u |--|++++|..|'''''''''''::::::::::::::''''''''''|+++|+-+-+-+-+-+
  |u u|u | |u ||||||..|              '::::::::'           |===|>=== _ _ ==
  |===|  |u|==|++++|==|              .::::::::.           | T |....| V |..
- |u u|u | |u ||HH||         \|/    .::::::::::.
+ |u u|u | |u ||HH||                .::::::::::.
  |===|_.|u|_.|+HH+|_              .::::::::::::.              _
                 __(_)___         .::::::::::::::.         ___(_)__
 ---------------/  / \  /|       .:::::;;;:::;;:::.       |\  / \  \-------
@@ -691,6 +762,14 @@ ___|_______|__[ == ==]/.::::::;;;:::::::::::::::;;;:::::::.\[=  == ]___|_____";
             Console.SetCursorPosition(6, Console.CursorTop);
             Console.Write("게임에 입장하는 중 입니다"); //로딩 흉내내기
             SlowText(" . . . . . ", 150);
+        }
+
+        public static void SoundPlay(string name)
+        {
+            bgm.controls.stop();//사운드 재생 전 기존 사운드 stop
+            bgm.URL = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + $"\\sound\\{name}.mp3";
+            bgm.controls.play();
+            bgm.settings.playCount = 20;//반복재생
         }
     }
     
@@ -871,7 +950,7 @@ ___|_______|__[ == ==]/.::::::;;;:::::::::::::::;;;:::::::.\[=  == ]___|_____";
                     Program.ColorText("치유 물약은 최대 체력 이상으로 회복 되지 않습니다.\n", ConsoleColor.Red);
                     Thread.Sleep(800);
                 }
-                Hp += 30;
+                Hp += 60;
                 if (Job == "전사" && Hp > 200)
                 {
                     Hp = 200;
@@ -889,7 +968,7 @@ ___|_______|__[ == ==]/.::::::;;;:::::::::::::::;;;:::::::.\[=  == ]___|_____";
                 }
                 else
                 {
-                    Program.ColorText("30의 체력을 회복 했습니다.\n", ConsoleColor.Red);
+                    Program.ColorText("60의 체력을 회복 했습니다.\n", ConsoleColor.Red);
                     Thread.Sleep(800);
                 }
             }
@@ -1158,14 +1237,25 @@ internal class Dungeon
 
 	public void StageSelect()
     {
+        Program.SoundPlay("dungeon");
+        string StageArt = @"______                                    
+|  _  \                                   
+| | | |_   _ _ __   __ _  ___  ___  _ __  
+| | | | | | | '_ \ / _` |/ _ \/ _ \| '_ \ 
+| |/ /| |_| | | | | (_| |  __/ (_) | | | |
+|___/  \__,_|_| |_|\__, |\___|\___/|_| |_|
+                    __/ |                 
+                   |___/                  ";
         Console.Clear();
+        Program.ColorText(StageArt, ConsoleColor.DarkGreen);
+        Console.WriteLine();
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("\n===============");
-        Console.WriteLine("||난이도 선택||");
-        Console.WriteLine("===============\n");
+        Console.WriteLine("\n              =============");
+        Console.WriteLine("              ||던전 선택||");
+        Console.WriteLine("              =============\n");
         Console.ResetColor();
 
-        Console.WriteLine("스파르타 던전에 입장하십니다.\n");
+        Console.WriteLine("      스파르타 던전에 입장하셨습니다.\n");
 
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("0. 나가기");
@@ -1184,6 +1274,7 @@ internal class Dungeon
 
             if (acton == 0)
             {
+                Program.SoundPlay("shop");
                 Program.Start();
             }
             else if (acton == 1)
@@ -1196,6 +1287,9 @@ internal class Dungeon
             }
             else if (acton == 3)
             {
+                Program.SoundPlay("cho'gall_comment");
+                Thread.Sleep(9400);
+                Program.SoundPlay("cho'gall_bgm");
                 Stage3();
             }
             BattleStart();
@@ -1207,7 +1301,6 @@ internal class Dungeon
         while (player.Hp > 0 && player.Hp > 0 && monsters.Any(m => m.Hp > 0))
         {
             battleInfo("battle_start");
-
             int acton = Program.CheckInput(1, 2);
             while (true)
             {
@@ -1239,6 +1332,17 @@ internal class Dungeon
     {
         battleInfo("basic_attack");
 
+        string attackArt = @"
+
+
+                        /\                                                 /\
+              _         )( ______________________   ______________________ )(         _
+             (_)///////(**)______________________> <______________________(**)\\\\\\\(_)
+                        )(                                                 )(
+                        \/                                                 \/
+";
+
+
         int acton = Program.CheckInput(1, monsters.Count);
 
         // [player 공격 로직]
@@ -1248,14 +1352,16 @@ internal class Dungeon
             damage = damage * 1.6;
             
         Console.Clear();
-        Console.WriteLine(player.Name + "의 공격!");
+        Console.WriteLine(attackArt);
+        Program.ColorText("\n\n                            " + player.Name + "의 공격!\n\n", ConsoleColor.Yellow);
 
         //기본공격시 회피 기능
         if (random.Next(1, 101) > 10)
         {
-            Console.WriteLine("Lv. " + monsters[acton - 1].Lv + "을(를) 맞췄습니다. [데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage)) + "]\n");
-            Console.WriteLine("Lv. " + monsters[acton - 1].Lv + " " + monsters[acton - 1].Name);
-            Console.Write("HP " + monsters[acton - 1].Hp + " -> ");
+            Console.Write("\n                                Lv. " + monsters[acton - 1].Lv + monsters[acton - 1].Name + "을(를) 맞췄습니다. ");
+            Program.ColorText("[데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage)) + "]\n\n", ConsoleColor.Red);
+            Console.WriteLine("                                  Lv. " + monsters[acton - 1].Lv + " " + monsters[acton - 1].Name);
+            Console.Write("                                  HP " + monsters[acton - 1].Hp + " -> ");
 
             if (monsters[acton - 1].Name == "초" || monsters[acton - 1].Name == "갈") //초갈용 대미지 계산
             {
@@ -1273,22 +1379,22 @@ internal class Dungeon
             else
                 monsters[acton - 1].Hp -= (int)(player.Offense + player.AddedOffense * (0.1 * damage));
             if (monsters[acton - 1].Hp > 0)
-                Console.WriteLine("HP " + monsters[acton - 1].Hp);
+                Program.ColorText("HP " + monsters[acton - 1].Hp, ConsoleColor.Green);
             else
             {
                 monsters[acton - 1].Hp = 0;
-                Console.WriteLine("Dead");
+                Program.ColorText("Dead\n", ConsoleColor.Red);
             }
 
             Console.WriteLine();
         }
         else
         {
-            Console.WriteLine("Lv. " + monsters[acton - 1].Name + "을(를) 공격했지만 아무일도 일어나지 않았습니다.");
+            Program.ColorText("\n                                 Lv. " + monsters[acton - 1].Lv + monsters[acton - 1].Name + "을(를) 공격했지만 대상이 회피 했습니다.\n", ConsoleColor.Red);
         }
-        Console.WriteLine("0. 다음\n");
+        Console.WriteLine("\n                                 엔터를 입력하세요.\n");
 
-        Console.WriteLine(">>");
+        Console.WriteLine("                                 >>");
         Console.ReadLine();
     }
     public void playerSkill()
@@ -1319,56 +1425,100 @@ internal class Dungeon
     {
         Console.Clear();
         int i = 0;
+        string battleArt = @"
+                                     ___       _   _   _      
+                                    / __\ __ _| |_| |_| | ___ 
+                                   /__\/// _` | __| __| |/ _ \
+                                  / \/  \ (_| | |_| |_| |  __/
+                                  \_____/\__,_|\__|\__|_|\___|";
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine(battleArt);
+        Console.ResetColor();
         foreach (var monster in monsters)
         {
-            Console.Write($"[{i + 1}] Lv.{monster.Lv} {monster.Name} ");
+            Program.ColorText($"\n\n                               [{i + 1}]", ConsoleColor.Cyan);
+            Console.Write($"  Lv.{monster.Lv} {monster.Name} ");
             if (monster.Hp > 0)
-                Console.WriteLine($"HP {monster.Hp}");
+                Program.ColorText($"\n                                                          HP {monster.Hp}\n", ConsoleColor.DarkGreen);
             else
-                Console.WriteLine("Dead");
+                Program.ColorText("\n                                                          Dead\n", ConsoleColor.Red);
             i += 1;
         }
         Console.WriteLine();
-        Console.WriteLine($"[내정보]\n" +
-            $"Lv.{player.Lv} {player.Name} ({player.Job})\n" +
-            $"HP {player.Hp}/{max_hp}\n" +
-            $"MP {player.Mp}/{max_mp}");
+        Program.ColorText($"\n                                            [내정보]\n\n", ConsoleColor.Yellow);
+        Console.Write($"                                        Lv.{player.Lv} {player.Name} ({player.Job})\n");
+        Program.ColorText($"                                          HP {player.Hp}/{max_hp}\n", ConsoleColor.Green);
+        Program.ColorText($"                                          MP {player.Mp}/{max_mp}\n", ConsoleColor.Blue);
 
         if (acton == "basic_attack")
         {
-            Console.WriteLine("공격할 대상을 선택해주세요.");
+            Console.WriteLine("\n                                 공격할 대상을 선택해주세요.");
         }
         else if (acton == "battle_start")
         {
-            Console.WriteLine("1. 공격\n");
-            Console.WriteLine("2. 스킬\n");
-            Console.WriteLine("원하시는 행동을 입력해주세요.");
+            Console.WriteLine("\n                              1. 공격\n");
+            Console.WriteLine("                              2. 스킬\n");
+            Program.ColorText("\n                                 원하시는 행동을 입력해주세요.\n", ConsoleColor.Yellow);
         }
         else if (acton == "skill")
         {
-            Console.WriteLine("1. 알파 스트라이크 - MP 10\n 공격력 * 2 로 하나의 적을 공격합니다.");
-            Console.WriteLine("2. 더블 스트라이크 - MP 15\n 공격력 * 1.5 로 2명의 적을 랜덤으로 공격합니다.");
-            Console.WriteLine("0. 취소");
-            Console.WriteLine("원하시는 행동을 입력해주세요.");
+            Program.ColorText("\n               1. 알파 스트라이크 - MP 10", ConsoleColor.Blue);
+            Console.WriteLine(" 공격력 * 2 로 하나의 적을 공격합니다.");
+            Program.ColorText("\n               2. 더블 스트라이크 - MP 15", ConsoleColor.Blue);
+            Console.WriteLine(" 공격력 * 1.5 로 2명의 적을 랜덤으로 공격합니다.");
+            Console.WriteLine("\n               0. 취소");
+            Program.ColorText("\n                                 원하시는 행동을 입력해주세요.\n", ConsoleColor.Yellow);
         }
         else if (acton == "alpha_strike")
         {
-            Console.WriteLine("'알파 스트라이크'로 공격할 대상을 선택해주세요.");
+            Console.WriteLine("\n                             '알파 스트라이크'로 공격할 대상을 선택해주세요.");
         }
         else if (acton == "double_strike")
         {
             //더블 스트라이크는 즉시발동스킬이라 대상을 선택할 필요 없음.
             //Console.WriteLine("'더블 스트라이크'로 공격할 대상을 선택해주세요.");
         }
-        Console.Write(">>");
+        Console.WriteLine("                                 >>");
     }
 
     public void skill_AlphaStrike()
     {
+        string alphastrikeArt = @"
+                                            )         
+                                              (            
+                                            '    }      
+                                          (    '      
+                                         '      (   
+                                          )  |    ) 
+                                        '   /|\    `
+                                       )   / | \  ` )   
+                                      {    | | |  {   
+                                     }     | | |  .
+                                      '    | | |    )
+                                     (    /| | |\    .
+                                      .  / | | | \  (
+                                    }    \ \ | / /  .        
+                                     (    \ `-' /    }
+                                     '    / ,-. \    ' 
+                                      }  / / | \ \  }
+                                     '   \ | | | /   } 
+                                      (   \| | |/  (
+                                        )  | | |  )
+                                        .  | | |  '
+                                           J | L
+                                     /|    J_|_L    |\
+                                     \ \___/ o \___/ /
+                                      \_____ _ _____/
+                                            |-|
+                                            |-|
+                                            |-|
+                                           ,'-'.
+                                           '---'
+";
         if (player.Mp < 10)
         {
-            Console.WriteLine("마나가 부족합니다.");
-            Thread.Sleep(1000);
+            Program.ColorText("                                 마나가 부족합니다.\n", ConsoleColor.Red);
+            Thread.Sleep(600);
             BattleStart();
         }
         int now_mp = player.Mp;
@@ -1384,11 +1534,13 @@ internal class Dungeon
             damage = damage * 1.6;
 
         Console.Clear();
-        Console.WriteLine(player.Name + "의 알파 스트라이크!");
-        Console.WriteLine($"MP {now_mp} -> {player.Mp}");
-        Console.WriteLine("Lv. " + monsters[acton - 1].Name + "을(를) 맞췄습니다. [데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2) + "]\n");
-        Console.WriteLine("Lv. " + monsters[acton - 1].Lv + " " + monsters[acton - 1].Name);
-        Console.Write("HP " + monsters[acton - 1].Hp + " -> ");
+        Console.WriteLine(alphastrikeArt);
+        Program.ColorText("                                  " + player.Name + "의 알파 스트라이크!\n", ConsoleColor.Red);
+        Program.ColorText($"                                      MP {now_mp} -> {player.Mp}", ConsoleColor.Blue);
+        Console.Write("\n\n                            Lv. " + monsters[acton - 1].Lv + monsters[acton - 1].Name + "을(를) 맞췄습니다. ");
+        Program.ColorText("[데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2) + "]\n\n", ConsoleColor.Red);
+        Console.WriteLine("                            Lv. " + monsters[acton - 1].Lv + " " + monsters[acton - 1].Name);
+        Console.Write("                                  HP " + monsters[acton - 1].Hp + " -> ");
         if (monsters[acton - 1].Name == "초" || monsters[acton - 1].Name == "갈") //초갈용 대미지 계산
         {
             if (monsters[acton - 1].Name == "초")
@@ -1405,20 +1557,44 @@ internal class Dungeon
         else
             monsters[acton - 1].Hp -= (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2);
         if (monsters[acton - 1].Hp > 0)
-            Console.WriteLine("HP " + monsters[acton - 1].Hp);
+            Program.ColorText($"HP {monsters[acton - 1].Hp}\n", ConsoleColor.Green);
         else
         {
             monsters[acton - 1].Hp = 0;
-            Console.WriteLine("Dead");
+            Program.ColorText("Dead\n", ConsoleColor.Red);
         }
+        Console.WriteLine("\n                                 엔터를 입력하세요.");
+        Console.WriteLine("                                 >>");
         Console.ReadLine();
     }
     public void skill_DoubleStrike()
     {
+        string doubleStrikeArt = @"
+
+
+                                     /\                    /\
+                                     \ \                  / /
+                                      \ \                / /
+                                       \.\              /./
+                                        \.\            /./
+                                         \.\          /./
+                                          \\\        ///
+                                           \.\      /./
+                                            \.\    /./
+                                             \.\__/./
+                                            _/)))(((\_
+                                            \|)\##/(|/
+                                            _|)/##\(|_
+                                            \|)))(((|/
+                                             /o/  \o\
+                                            /o/    \o\
+                                           /_/      \_\
+
+";
         if (player.Mp < 15)
         {
-            Console.WriteLine("마나가 부족합니다.");
-            Thread.Sleep(1000);
+            Program.ColorText("                                 마나가 부족합니다.\n", ConsoleColor.Red);
+            Thread.Sleep(600);
             BattleStart();
         }
         int now_mp = player.Mp;
@@ -1433,7 +1609,7 @@ internal class Dungeon
             if (monster.Name == "초" || monster.Name == "갈")
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Program.SlowText("\n\n 초&갈 : \"우리는 둘이지만 몸은 하나다! 그런 수법에 당하지 않는다!\"", 50);
+                Program.SlowText("\n\n                초&갈 : \"우리는 둘이지만 몸은 하나다! 그런 수법에 당하지 않는다!\"", 20);
                 Console.ResetColor();
                 Thread.Sleep(600);
                 return;
@@ -1441,8 +1617,9 @@ internal class Dungeon
         }
         if (monstercount < 2)
         {
-            Console.WriteLine("더블 스트라이크는 몬스터 수가 2마리 이상일때 사용가능합니다.");
-            Console.WriteLine("엔터를 입력하세요.");
+            Program.ColorText("                 더블 스트라이크는 몬스터 수가 2마리 이상일때 사용가능합니다.\n", ConsoleColor.Red);
+            Console.WriteLine("\n                                 엔터를 입력하세요.");
+            Console.WriteLine("                                 >>");
             Console.ReadLine();
             playerSkill();
             return;
@@ -1464,68 +1641,96 @@ internal class Dungeon
         }
 
         Console.Clear();
-        Console.WriteLine(player.Name + "의 더블 스트라이크!");
-        Console.WriteLine($"MP {now_mp} -> {player.Mp}");
-        Console.WriteLine("Lv. " + monsters[target1].Name + "을(를) 맞췄습니다. [데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 1.5) + "]\n");
-        Console.WriteLine("Lv. " + monsters[target1].Lv + " " + monsters[target1].Name);
-        Console.Write("HP " + monsters[target1].Hp + " -> ");
+        Console.WriteLine(doubleStrikeArt);
+        Program.ColorText("                            " + player.Name + "의 더블 스트라이크!\n", ConsoleColor.Cyan);
+        Program.ColorText($"                                MP {now_mp} -> {player.Mp}\n", ConsoleColor.Blue);
+        Console.Write("\n                            Lv. " + monsters[target1].Lv + monsters[target1].Name + "을(를) 맞췄습니다. ");
+        Program.ColorText("[데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 1.5) + "]\n\n", ConsoleColor.Red);
+        Console.WriteLine("                            Lv. " + monsters[target1].Lv + " " + monsters[target1].Name);
+        Console.Write("\n                                  HP " + monsters[target1].Hp + " -> ");
 
         monsters[target1].Hp -= (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 1.5);
         if (monsters[target1].Hp > 0)
-            Console.WriteLine("HP " + monsters[target1].Hp);
+            Program.ColorText($"HP {monsters[target2].Hp}\n", ConsoleColor.Green);
         else
         {
             monsters[target1].Hp = 0;
-            Console.WriteLine("Dead");
+            Program.ColorText("Dead\n", ConsoleColor.Red);
         }
         Console.WriteLine();
 
-        Console.WriteLine(player.Name + "의 공격!");
-        Console.WriteLine("Lv. " + monsters[target2].Name + "을(를) 맞췄습니다. [데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 1.5) + "]\n");
-        Console.WriteLine("Lv. " + monsters[target2].Lv + " " + monsters[target2].Name);
-        Console.Write("HP " + monsters[target2].Hp + " -> ");
+        Program.ColorText("\n                            " + player.Name + "의 2차 공격!\n", ConsoleColor.Cyan);
+        Console.Write("                            Lv. " + monsters[target2].Lv + monsters[target2].Name + "을(를) 맞췄습니다. ");
+        Program.ColorText("[데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 1.5) + "]\n\n", ConsoleColor.Red);
+        Console.WriteLine("                            Lv. " + monsters[target2].Lv + " " + monsters[target2].Name);
+        Console.Write("\n                                  HP " + monsters[target2].Hp + " -> ");
 
         monsters[target2].Hp -= (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 1.5);
         if (monsters[target2].Hp > 0)
-            Console.WriteLine("HP " + monsters[target2].Hp);
+            Program.ColorText($"HP {monsters[target2].Hp}\n", ConsoleColor.Green);
         else
         {
             monsters[target2].Hp = 0;
-            Console.WriteLine("Dead");
+            Program.ColorText("Dead\n", ConsoleColor.Red);
         }
+        Console.WriteLine("\n                                 엔터를 입력하세요.");
+        Console.WriteLine("                                 >>");
         Console.ReadLine();
     }
 
     public void MonsterAttack(Monster monster)
     {
+        string monsterattackArt = @"
+                                             ______
+                                         .-""      ""-.
+                                        /              \
+                                       |               |
+                                       |,  .-.   .-.  ,|
+                                       | )(__/   |__)( |
+                                       |/     /\      \|
+                             (@_       (_     ^^      _)
+                        _     ) \_______\__|IIIIII||__/_________________
+                       (_)@8@8{}<________|-\IIIIII|/-|___________________>
+                              )_/        \          /
+                             (@           `--------` 
+
+
+";
         Console.Clear();
+        Console.WriteLine(monsterattackArt);
         if (player.Hp > 0)
         {
-            Console.WriteLine("Lv. " + monster.Lv + " " + monster.Name + "의 공격!");
-            Console.WriteLine($"{player.Name} 을(를) 맞췄습니다. [데미지 :  {(int)Math.Ceiling(monster.Offense - ((player.Defence + player.AddedDefence) * 0.1))}]");
-            Console.WriteLine("");
-            Console.WriteLine("Lv. " + player.Lv + " " + player.Name);
-            Console.Write("HP " + player.Hp + " -> ");
+            Program.ColorText("                             Lv. " + monster.Lv + " " + monster.Name + "의 공격!\n", ConsoleColor.Yellow);
+            Console.Write($"\n                                {player.Name} 을(를) 맞췄습니다. ");
+            Program.ColorText($"[데미지 :  { (int)Math.Ceiling(monster.Offense - ((player.Defence + player.AddedDefence) * 0.1))}]", ConsoleColor.Red);
+            Console.WriteLine("\n\n                                  Lv. " + player.Lv + " " + player.Name);
+            Console.Write("                                  HP " + player.Hp + " -> ");
             player.Hp -= (int)Math.Ceiling(monster.Offense - ((player.Defence + player.AddedDefence) * 0.1));
             if (player.Hp > 0)
             {
-                Console.WriteLine(player.Hp);
+                Program.ColorText($"{player.Hp}\n", ConsoleColor.Green);
             }
             
             else
             {
                 player.Hp = 0;
-                Console.WriteLine("Dead");
+                Program.ColorText("Dead\n", ConsoleColor.Red);
             }
         }
-        Console.WriteLine("엔터를 입력하세요");
+        Console.WriteLine("\n                                 엔터를 입력하세요");
+        Console.WriteLine("                                 >>");
         Console.ReadLine();
     }
 	public void Result()
 	{
 		Console.Clear();
-		Console.WriteLine("Battle!! - Result\n");
-		if (player.Hp > 0)
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine("                                      ====================");
+        Console.WriteLine("                                      ||던전 전투 - 결과||");
+        Console.WriteLine("                                      ====================");
+        Console.ResetColor();
+
+        if (player.Hp > 0)
 		{
 			int totalExpGained = 0;
 			int totalGoldGained = 0;
@@ -1565,35 +1770,37 @@ internal class Dungeon
 				player.ExpToLevelUp = CalculateExpForNextLevel(player.Lv);
 			}
 
-			Console.WriteLine("Victory\n");
-			Console.WriteLine($"던전에서 몬스터 {monsters.Count}마리를 잡았습니다.\n");
-			Console.WriteLine($"[캐릭터 정보]\n");
-			Console.WriteLine($"현재레벨: Lv.{player.Lv} {player.Name} -> 다음레벨: Lv.{player.Lv + 1} {player.Name}\n");
-			Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
-			Console.WriteLine($"MP {max_mp} -> {player.Mp}\n");
-			Console.WriteLine($"exp {player.Exp - totalExpGained} -> {player.Exp}\n");
+            Console.WriteLine("\n                                            Victory\n\n");
+			Console.WriteLine($"                         던전에서 몬스터 {monsters.Count}마리를 잡았습니다.\n");
+			Program.ColorText($"                                       [캐릭터 정보]\n\n", ConsoleColor.Yellow);
+			Console.WriteLine($"                         현재레벨: Lv.{player.Lv} {player.Name} -> 다음레벨: Lv.{player.Lv + 1} {player.Name}\n");
+			Console.WriteLine($"                         HP {max_hp} -> {player.Hp}\n");
+			Console.WriteLine($"                         MP {max_mp} -> {player.Mp}\n");
+			Console.WriteLine($"                         exp {player.Exp - totalExpGained} -> {player.Exp}\n");
 
-			Console.WriteLine("[획득 아이템]");
+			Program.ColorText("                                       [획득 아이템]\n", ConsoleColor.Green);
 			foreach (Item item in itemsGained)
 			{
-				Console.WriteLine($"{item.Name} - 1");
+				Console.WriteLine($"                         {item.Name} - 1");
 			}
 		}
 		else
 		{
-			Console.WriteLine("You Lose\n");
-			Console.WriteLine($"Lv.{player.Lv} {player.Name}");
-			Console.WriteLine($"HP {max_hp} -> {player.Hp}\n");
-			Console.WriteLine($"MP {max_mp} -> {player.Mp}\n");
+            Console.WriteLine("\n                                             Lost\n\n");
+			Console.WriteLine($"                         Lv.{player.Lv} {player.Name}");
+			Console.WriteLine($"                         HP {max_hp} -> {player.Hp}\n");
+			Console.WriteLine($"                         MP {max_mp} -> {player.Mp}\n");
 		}
 
-		Console.WriteLine("0. 다음\n");
-		Console.WriteLine(">>");
-		Console.WriteLine("엔터를 입력하면 마을로 이동합니다.");
+		Console.WriteLine("                         0. 다음\n");
+		Console.WriteLine("                         >>");
+		Console.WriteLine("                         엔터를 입력하면 마을로 이동합니다.");
 
         //일단 종료하지는 않고 마을로 이동함(회복아이템?)
         Console.ReadLine();
+        Console.SetCursorPosition(37, Console.CursorTop);
         Console.Clear();
+        Program.SoundPlay("shop");
         Program.Start();
     }
 
