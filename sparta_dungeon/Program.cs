@@ -87,7 +87,24 @@ namespace sparta_dungeon
                 }
             }
         }
-
+        //게임 불러오기 후 장비 장착 상태를 가져옴에도 불구하고 중첩 장착이 되는 버그 해결을 하고자 했는데 시간이 없어
+        //장착 중인 장비 다시 체크해서 재장착 시키는 급조 방식으로 우선 해결했습니다.
+        public static void FindEquippedItem() 
+        {
+            foreach (var item in inventory.inventoryList)
+            {
+                if (item.isEquiped && item.Offense > 0) //무기 재장착
+                {
+                    player.EquipedWeapon = item;
+                    player.isEquipedWeapon = true;
+                }
+                else if (item.isEquiped && item.Defense > 0)
+                {
+                    player.EquipedArmor = item;
+                    player.isEquipedArmor = true;
+                }
+            }
+        }
         //min max까지 인풋 입력 가능 및 매개변수로 받은 인풋이 숫자인지 판단하는 메서드
         public static int CheckInput(int min, int max)
         {
@@ -117,7 +134,7 @@ namespace sparta_dungeon
         }
         public static void Start()
         {
-            string title = @"+================================================================+ 
+            string title = @"+================================================================+
 ||  _____             _          ___                            ||
 || |   __|___ ___ ___| |_ ___   |    ＼ _ _ ___ ___ ___ ___ ___ ||
 || |__   | . | .'|  _|  _| .'|  |  |  | | |   | . | -_| . |   | ||
@@ -158,8 +175,36 @@ namespace sparta_dungeon
                 }
                 else if (acton == 3)
                 {
+                    string storeOwner = @"                          ,---.
+                         /    |
+                        /     |
+                       /       |
+                      /        |
+                 ___,'         |
+               <  -'           :
+                `-.__..--'``-,__\_
+                   |o/ ` o,. )_`>
+                   :/ `      ||/)
+                   (_.).__ ,-` |\
+                   /( `.``   ` | :
+                   \'`-.)  `   ; ;
+                   | `        /-<
+                   |     `   /   `.
+   ,-_-..____     /|  `     :__..-'\
+  /,'-.__\\  ``-./ :`       ;       \
+  `\ `\  `\\  \ :  (   `   /  ,   `. \
+    \` \   \\   |  | `    :  :     .\ \
+     \ `\_  ))  :  ;      |  |      ): :
+    (`-.-'\ ||  |\ \   `  ;  ;       | |
+     \-_   `;;._   ( `   /  /_       | |
+      `-.-.// ,'`-._\__ /_,'         ; |
+         \:: :     /     `      ,   /  |
+          || |    (         ,' /   /   |
+          ||                 ,'   /    |";
                     Console.Clear();
-                    Console.WriteLine("\n당신은 상점에 도착하셨습니다.\n");
+                    Console.WriteLine();
+                    ColorText(storeOwner, ConsoleColor.Cyan);
+                    Console.WriteLine("\n\n당신은 상점에 도착하셨습니다.\n");
                     Program.ColorText("문영오 매니저(상점주인): ", ConsoleColor.DarkCyan);
                     Program.SlowText("어서오시게나 젊은 르탄이. 무엇을 사고 싶으신가? 팔 것이라도?", 20);
                     Thread.Sleep(800);
@@ -177,15 +222,19 @@ namespace sparta_dungeon
                     // Json
                     string _fileName = "playerInfo.json";
                     string _itemFileName = "itemList.json";
+                    string _shopFileName = "shopInfo.json";
                     // 데이터 경로 저장. (C드라이브, Documents)
                     // Json 저장(파일로 저장)
                     string _userDocumentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                     string _filePath = Path.Combine(_userDocumentsFolder, _fileName);
                     string _itemFilePath = Path.Combine(_userDocumentsFolder, _itemFileName);
+                    string _shopFilePath = Path.Combine(_userDocumentsFolder, _shopFileName);
                     string _playerJson = JsonConvert.SerializeObject(player, Formatting.Indented);
                     string _itemJson = JsonConvert.SerializeObject(inventory.inventoryList, Formatting.Indented);
+                    string _shopJson = JsonConvert.SerializeObject(inventory.shopItemList, Formatting.Indented);
                     File.WriteAllText(_filePath, _playerJson);
                     File.WriteAllText(_itemFilePath, _itemJson);
+                    File.WriteAllText(_shopFilePath, _shopJson);
                     Console.ForegroundColor = ConsoleColor.Red;
                     SlowText("저장중 입니다...", 50);
                     Console.ResetColor();
@@ -206,6 +255,7 @@ namespace sparta_dungeon
             //Json
             string _playerFileName = "playerInfo.json";
             string _itemFileName = "itemList.json";
+            string _shopFileName = "shopInfo.json";
             // 데이터 경로 불러오기. (C드라이브, Documents)
             string _userDocumentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
@@ -230,9 +280,12 @@ namespace sparta_dungeon
 
             // 아이템 데이터 로드
             string _itemFilePath = Path.Combine(_userDocumentsFolder, _itemFileName);
-            if (File.Exists(_itemFilePath))
+            string _shopFilePath = Path.Combine(_userDocumentsFolder, _shopFileName);
+            if (File.Exists(_itemFilePath) && File.Exists(_shopFilePath))
             {
+                string _shopJson = File.ReadAllText(_shopFilePath);
                 string _itemJson = File.ReadAllText(_itemFilePath);
+                inventory.shopItemList = JsonConvert.DeserializeObject<List<Item>>(_shopJson);
                 inventory.inventoryList = JsonConvert.DeserializeObject<List<Item>>(_itemJson);
                 Console.ForegroundColor = ConsoleColor.Red;
                 SlowText("아이템 데이터를 불러왔습니다.", 50);
@@ -247,6 +300,7 @@ namespace sparta_dungeon
                 Console.ResetColor();
             }
             dungeon = new Dungeon(player);
+            FindEquippedItem();
         }
 
         static void State()
@@ -568,31 +622,64 @@ namespace sparta_dungeon
         }
         public static void Intro()
         {
+            string introArt = @"                                                           |>>>
+                   _                      _                |
+    ____________ .' '.    _____/----/-\ .' './========\   / \
+   //// ////// /V_.-._\  |.-.-.|===| _ |-----| u    u |  /___\
+  // /// // ///==\ u |.  || | ||===||||| |T| |   ||   | .| u |_ _ _ _ _ _
+ ///////-\////====\==|:::::::::::::::::::::::::::::::::::|u u| U U U U U
+ |----/\u |--|++++|..|'''''''''''::::::::::::::''''''''''|+++|+-+-+-+-+-+
+ |u u|u | |u ||||||..|              '::::::::'           |===|>=== _ _ ==
+ |===|  |u|==|++++|==|              .::::::::.           | T |....| V |..
+ |u u|u | |u ||HH||         \|/    .::::::::::.
+ |===|_.|u|_.|+HH+|_              .::::::::::::.              _
+                __(_)___         .::::::::::::::.         ___(_)__
+---------------/  / \  /|       .:::::;;;:::;;:::.       |\  / \  \-------
+______________/_______/ |      .::::::;;:::::;;:::.      | \_______\________
+|       |     [===  =] /|     .:::::;;;::::::;;;:::.     |\ [==  = ]   |
+|_______|_____[ = == ]/ |    .:::::;;;:::::::;;;::::.    | \[ ===  ]___|____
+     |       |[  === ] /|   .:::::;;;::::::::;;;:::::.   |\ [=  ===] |
+_____|_______|[== = =]/ |  .:::::;;;::::::::::;;;:::::.  | \[ ==  =]_|______
+ |       |    [ == = ] /| .::::::;;:::::::::::;;;::::::. |\ [== == ]      |
+_|_______|____[=  == ]/ |.::::::;;:::::::::::::;;;::::::.| \[  === ]______|_
+   |       |  [ === =] /.::::::;;::::::::::::::;;;:::::::.\ [===  =]   |
+___|_______|__[ == ==]/.::::::;;;:::::::::::::::;;;:::::::.\[=  == ]___|_____";
+
             Console.Clear();
             Console.WriteLine();
+            Console.WriteLine(introArt);
+            Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.SetCursorPosition(28, Console.CursorTop);
             SlowText("이곳은 내일배움캠프 왕국.\n", 50);
             Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.SetCursorPosition(25, Console.CursorTop);
             SlowText($"당신의 이름은 {player.Name}. 직업은 {player.Job}입니다.\n", 40);
+            Console.SetCursorPosition(18, Console.CursorTop);
             SlowText("오랜 모험 끝에 스파르타 코딩 마을에 도착하셨습니다.", 50);
+            Console.SetCursorPosition(17, Console.CursorTop);
             SlowText("이곳은 많은 초보 코딩 모험가들이\n", 30);
 
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.SetCursorPosition(2, Console.CursorTop);
+            Console.SetCursorPosition(35, Console.CursorTop);
             Console.WriteLine("==========");
-            Console.SetCursorPosition(2, Console.CursorTop);
+            Console.SetCursorPosition(35, Console.CursorTop);
             SlowText("|| 회사 ||", 100);
-            Console.SetCursorPosition(2, Console.CursorTop);
+            Console.SetCursorPosition(35, Console.CursorTop);
             Console.WriteLine("==========\n");
 
             Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.SetCursorPosition(10, Console.CursorTop);
             SlowText("라는 무시무시한 던전을 목표로 수련을 위해 거쳐가는 마을이기에", 30);
+            Console.SetCursorPosition(9, Console.CursorTop);
             SlowText("밝은 미래를 꿈꾸는 다양한 모험가들이 이곳에서 준비를 마치고 갑니다.\n", 30);
             Thread.Sleep(400);
             Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.SetCursorPosition(4, Console.CursorTop);
             SlowText("현 마을의 촌장은 절대적인 지지를 자랑하는 한효승(내배캠 매니저)씨 입니다.\n\n", 50);
             Console.ResetColor();
             Thread.Sleep(600);
+            Console.SetCursorPosition(6, Console.CursorTop);
             Console.Write("게임에 입장하는 중 입니다"); //로딩 흉내내기
             SlowText(" . . . . . ", 150);
         }
