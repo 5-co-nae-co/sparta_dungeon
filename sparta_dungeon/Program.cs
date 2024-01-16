@@ -82,7 +82,7 @@ namespace sparta_dungeon
             Console.SetWindowSize(105, 43);//시작 화면 크기 고정 코드
             SoundPlay("shop");
             settings();
-            /*Intro();*/ //Note 테스트 할 때에는 오래걸리니 주석화 한 뒤 진행하세요.
+            Intro(); //Note 테스트 할 때에는 오래걸리니 주석화 한 뒤 진행하세요.
             Start();
         }
         public static void CalcAddedStat() //추가 아이템 스텟을 체크하는 메서드
@@ -353,7 +353,7 @@ namespace sparta_dungeon
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 SlowText("\n\n        당신은 여관에서 휴식을 취합니다 . . . . . . . .", 80);
                 Console.ResetColor();
-
+                
                 if (player.Job == "전사")
                 {
                     player.Hp = 200;
@@ -369,6 +369,7 @@ namespace sparta_dungeon
                     player.Hp = 150;
                     player.Mp = 100;
                 }
+                player.Gold -= 500;
                 Start();
             }
             else
