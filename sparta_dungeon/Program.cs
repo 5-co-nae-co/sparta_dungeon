@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System;
+using System.Threading;
 
 namespace sparta_dungeon
 {
@@ -18,6 +19,9 @@ namespace sparta_dungeon
         static Character player;
         static Inventory inventory = new Inventory();
         static Dungeon dungeon;
+
+
+
         static void settings()
         {
             player = new Character(1, "", "", 0, 0, 0, 0, 0);        //Charater 객체 생성
@@ -139,11 +143,12 @@ namespace sparta_dungeon
             Console.WriteLine("     ---     ");
             Console.WriteLine("5. 게임 저장");
             Console.WriteLine("6. 게임 불러오기");
+            Console.WriteLine("7. 임무");
             Console.ResetColor();
             Console.WriteLine("\n--------------------------------------------------------------------");
             Console.WriteLine("원하시는 행동을 입력해주세요.");
             Console.WriteLine(">>");
-            int acton = CheckInput(1, 6);
+            int acton = CheckInput(1, 7);
             while (true)
             {
                 if (acton == 1)
@@ -197,6 +202,12 @@ namespace sparta_dungeon
                 {
                     LoadGameData();
                     Start();
+                    break;
+                }
+                else if (acton == 7)
+                {
+                    Console.Clear();
+                    QuestMenu();
                     break;
                 }
             }
@@ -565,6 +576,257 @@ namespace sparta_dungeon
                 ShopSell();
             }
         }
+
+
+
+        static void QuestMenu()
+        {
+
+
+            //Console.Clear();
+            Console.WriteLine("■ Quest!! ■");
+            Console.WriteLine("");
+            Console.WriteLine("1.아이템 구매하기");
+            Console.WriteLine("2.장비를 장착하기");
+            Console.WriteLine("3.더욱 더 강해지기!");
+            Console.WriteLine("");
+            Console.WriteLine("0. 나가기");
+            Console.WriteLine("");
+            Console.WriteLine();
+            Console.WriteLine("원하시는 행동을 입력해주세요.");
+            Console.WriteLine(">>");
+
+            int acton = CheckInput(0, 4);
+            while (true)
+            {
+
+                if (acton == 0)
+                {
+                    Start();
+                }
+
+                else if (acton == 1)
+                {
+                    QuestFirst();
+                    break;
+                }
+                else if (acton == 2)
+                {
+                    QuestSecond();
+                    break;
+                }
+                else if (acton == 3)
+                {
+                    QuestThird();
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("잘못된 입력입니다.");
+                    break;
+
+                }
+            }
+
+        }
+
+        static void QuestFirst()
+        {
+
+            string c = "1. 수락";
+
+            List<Item> itemList = inventory.inventoryList;
+
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("■ Quest!! ■");
+                Console.WriteLine("");
+                Console.WriteLine("상점에서 물건사기");
+                Console.WriteLine("");
+                Console.WriteLine("이봐! 지나가는 젊은이.\n여기 좋은 물건 많은데.\n한 번 둘러보고가.");
+                Console.WriteLine("");
+                Console.WriteLine("물건구매");
+                Console.WriteLine("");
+                Console.WriteLine("-보상-   \nGold 500");
+                Console.WriteLine("");
+                Console.WriteLine(c);
+                Console.WriteLine("0. 나가기");
+                Console.WriteLine();
+                Console.WriteLine("원하시는 행동을 입력해주세요.");
+                Console.WriteLine(">>");
+
+                int acton = CheckInput(0, 4);
+
+                if (acton == 0)
+                {
+                    QuestMenu();
+                    break;
+                }
+                else if (acton == 1)
+                {
+                    c = c.Replace("수락", "수락중");
+
+                    if(acton <= itemList.Count)
+                    {
+                        Item inputItem = itemList[acton - 1];
+                        inventory.inventoryList.Add(inputItem);
+
+                        if (inputItem.isBuy = true)
+                        {
+                            c = c.Replace("수락중", "완료");
+                            player.Gold += 500;
+                        }
+                        else
+                        {
+                            player.Gold += 0;
+                        }
+                    }
+                    else
+                    {
+                        
+                    }
+
+                }
+            }
+            QuestFirst();
+        }
+
+
+        static void QuestSecond()
+        {
+            string c = "1. 수락";
+
+            List<Item> itemList = inventory.inventoryList;
+
+
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("■ Quest!! ■");
+                Console.WriteLine("");
+                Console.WriteLine("장비를 장착하기");
+                Console.WriteLine("");
+                Console.WriteLine("이봐! 모험은 처음이지?\n장비는 모험의 기본이지.\n한 번 잡아보라구!");
+                Console.WriteLine("");
+                Console.WriteLine("'장비관리'에서 장비를 장착하기");
+                Console.WriteLine("");
+                Console.WriteLine("-보상-   \nGold 500");
+                Console.WriteLine("");
+                Console.WriteLine(c);
+                Console.WriteLine("0. 나가기");
+
+                Console.WriteLine();
+                Console.WriteLine("원하시는 행동을 입력해주세요.");
+                Console.WriteLine(">>");
+                int acton = CheckInput(0, 5);
+
+
+                if (acton == 0)
+                {
+                    QuestMenu();
+                    break;
+                }
+
+                else if (acton == 1)
+                {
+                    c = c.Replace("수락", "수락중");
+
+
+
+                    if (acton <= itemList.Count)
+                    {
+                        Item inputItem = itemList[acton - 1];
+                        inventory.inventoryList.Add(inputItem);
+
+                        if (inputItem.isEquiped = true)
+                        { 
+                
+                            c = c.Replace("수락중", "완료");
+                            player.Gold += 500;
+                        }
+                        else
+                        {
+                            Console.WriteLine("조건미달성");
+                            player.Gold += 0;
+                        }
+                    }
+                    else
+                    {
+                        
+                    }
+                }
+            }
+            QuestSecond();
+        }
+
+
+        static void QuestThird()
+        {
+            string c = "1. 수락";
+
+
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("■ Quest!! ■");
+                Console.WriteLine("");
+                Console.WriteLine("더욱 더 강해지기!");
+                Console.WriteLine("");
+                Console.WriteLine("어엿한 모험가로군\n모험의 첫걸음을 옮길 때가 왔어.\n앞길을 막는 녀석은 모두 날려버려.");
+                Console.WriteLine("");
+                Console.WriteLine("'몬스터와 조우하기");
+                Console.WriteLine("");
+                Console.WriteLine("-보상-   \nGold 500");
+                Console.WriteLine("");
+                Console.WriteLine(c);
+                Console.WriteLine("0. 나가기");
+                Console.WriteLine();
+                Console.WriteLine("원하시는 행동을 입력해주세요.");
+                Console.WriteLine(">>");
+                int acton = CheckInput(0, 4);
+
+                if (acton == 0)
+                {
+                    QuestMenu();
+                    break;
+                }
+
+                else if (acton == 1)
+                {
+
+
+                    c = c.Replace("수락", "수락중");
+
+                    if (player.Exp > 0)
+                    {
+                        c = c.Replace("수락중", "완료");
+                        player.Gold += 500;
+                    }
+                    else
+                    {
+                        player.Gold += 0;
+                    }
+                }
+
+                else
+                {
+                    Console.WriteLine("잘못된 입력입니다.");
+                    break;
+
+                }
+
+
+
+            }
+            QuestThird();
+        }
+
+
+
+
+
+
         public static void Intro()
         {
             Console.Clear();
@@ -953,7 +1215,18 @@ namespace sparta_dungeon
     }
 }
 
-public class Monster
+
+
+
+
+
+
+
+
+
+
+
+    public class Monster
 {
     public string Name;
     public int Lv;
@@ -961,6 +1234,7 @@ public class Monster
     public int Offense;
     public int Defense;
     public string Desc;//description(변수명)
+
 
     public List<Monster> monsters;
     public void Monsters()
@@ -979,7 +1253,14 @@ public class Monster
         Offense = offense;
         Defense = defense;
         Desc = desc;
+
     }
+
+    //public Monster()
+    //{
+    //}
+
+
 }
 
 internal class Dungeon
@@ -1039,6 +1320,8 @@ internal class Dungeon
 
         monsters.Add(cho);
         monsters.Add(gall);
+
+
     }
 
     public void StageSelect()
@@ -1112,11 +1395,15 @@ internal class Dungeon
             {
                 if (player.Hp <= 0)
                     break;
+
+                    
                 else if (monster.Hp > 0)
                 {
                     MonsterAttack(monster);
                 }
             }
+
+
         }
         Result();
     }
