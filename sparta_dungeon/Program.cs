@@ -989,8 +989,6 @@ internal class Dungeon
     Random random = new Random();
     int max_hp;
     int max_mp;
-    int him;
-    int bango;
 
 
     //이제 필요없나?
@@ -1271,7 +1269,6 @@ internal class Dungeon
         Console.Clear();
         Console.WriteLine(player.Name + "의 알파 스트라이크!");
         Console.WriteLine($"MP {now_mp} -> {player.Mp}");
-        Console.WriteLine("him" + him);
         Console.WriteLine("Lv. " + monsters[acton - 1].Name + "을(를) 맞췄습니다. [데미지 : " + (int)((player.Offense + player.AddedOffense) * (0.1 * damage) * 2) + "]\n");
         Console.WriteLine("Lv. " + monsters[acton - 1].Lv + " " + monsters[acton - 1].Name);
         Console.Write("HP " + monsters[acton - 1].Hp + " -> ");
