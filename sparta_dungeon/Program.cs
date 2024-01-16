@@ -602,7 +602,7 @@ namespace sparta_dungeon
         public static void SoundPlay(string name)
         {
             bgm.controls.stop();//사운드 재생 전 기존 사운드 stop
-            bgm.URL = $".\\sound\\{name}.mp3";
+            bgm.URL = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + $"\\sound\\{name}.mp3";
             bgm.controls.play();
             bgm.settings.playCount = 20;//반복재생
         }
