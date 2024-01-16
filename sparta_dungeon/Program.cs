@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System;
+using WMPLib;
 
 namespace sparta_dungeon
 {
@@ -18,11 +19,13 @@ namespace sparta_dungeon
         static Character player;
         static Inventory inventory = new Inventory();
         static Dungeon dungeon;
-		public static Inventory GetInventory()
+        public static Inventory GetInventory()
 		{
 			return inventory;
 		}
-		static void settings()
+
+        static WindowsMediaPlayer bgm = new WindowsMediaPlayer();
+        static void settings()
         {
             player = new Character(1, "", "", 0, 0, 0, 0, 0);        //Charater 객체 생성
             player.SelectName(player);                            //플레이어 이름 설정
@@ -77,6 +80,7 @@ namespace sparta_dungeon
         public static void Main()
         {
             Console.SetWindowSize(105, 43);//시작 화면 크기 고정 코드
+            SoundPlay("shop");
             settings();
             /*Intro();*/ //Note 테스트 할 때에는 오래걸리니 주석화 한 뒤 진행하세요.
             Start();
@@ -692,6 +696,14 @@ ___|_______|__[ == ==]/.::::::;;;:::::::::::::::;;;:::::::.\[=  == ]___|_____";
             Console.Write("게임에 입장하는 중 입니다"); //로딩 흉내내기
             SlowText(" . . . . . ", 150);
         }
+
+        public static void SoundPlay(string name)
+        {
+            bgm.controls.stop();//사운드 재생 전 기존 사운드 stop
+            bgm.URL = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + $"\\sound\\{name}.mp3";
+            bgm.controls.play();
+            bgm.settings.playCount = 20;//반복재생
+        }
     }
     
     class Character
@@ -1158,6 +1170,7 @@ internal class Dungeon
 
 	public void StageSelect()
     {
+        Program.SoundPlay("dungeon");
         string StageArt = @"______                                    
 |  _  \                                   
 | | | |_   _ _ __   __ _  ___  ___  _ __  
@@ -1194,6 +1207,7 @@ internal class Dungeon
 
             if (acton == 0)
             {
+                Program.SoundPlay("shop");
                 Program.Start();
             }
             else if (acton == 1)
@@ -1206,6 +1220,9 @@ internal class Dungeon
             }
             else if (acton == 3)
             {
+                Program.SoundPlay("cho'gall_comment");
+                Thread.Sleep(9400);
+                Program.SoundPlay("cho'gall_bgm");
                 Stage3();
             }
             BattleStart();
@@ -1710,6 +1727,7 @@ internal class Dungeon
         //일단 종료하지는 않고 마을로 이동함(회복아이템?)
         Console.ReadLine();
         Console.Clear();
+        Program.SoundPlay("shop");
         Program.Start();
     }
 
