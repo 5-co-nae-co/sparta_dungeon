@@ -161,7 +161,7 @@ namespace sparta_dungeon
                     Console.Clear();
                     Console.WriteLine("\n당신은 상점에 도착하셨습니다.\n");
                     Program.ColorText("문영오 매니저(상점주인): ", ConsoleColor.DarkCyan);
-                    Program.SlowText("어서오시게나 젊은 르탄이. 무엇을 사고 싶으신가? 팔 것이라도?", 30);
+                    Program.SlowText("어서오시게나 젊은 르탄이. 무엇을 사고 싶으신가? 팔 것이라도?", 20);
                     Thread.Sleep(800);
                     Console.WriteLine();
                     Shop();
@@ -217,14 +217,14 @@ namespace sparta_dungeon
                 player = JsonConvert.DeserializeObject<Character>(_playerJson);
                 Console.ForegroundColor = ConsoleColor.Red;
                 SlowText($"플레이어({player.Name}) 데이터를 불러왔습니다.", 50);
-                Thread.Sleep(600);
+                Thread.Sleep(300);
                 Console.ResetColor();
             }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 SlowText("저장된 플레이어 데이터가 없습니다.", 50);
-                Thread.Sleep(600);
+                Thread.Sleep(300);
                 Console.ResetColor();
             }
 
@@ -236,16 +236,17 @@ namespace sparta_dungeon
                 inventory.inventoryList = JsonConvert.DeserializeObject<List<Item>>(_itemJson);
                 Console.ForegroundColor = ConsoleColor.Red;
                 SlowText("아이템 데이터를 불러왔습니다.", 50);
-                Thread.Sleep(600);
+                Thread.Sleep(300);
                 Console.ResetColor();
             }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 SlowText("저장된 아이템 데이터가 없습니다.", 50);
-                Thread.Sleep(600);
+                Thread.Sleep(300);
                 Console.ResetColor();
             }
+            dungeon = new Dungeon(player);
         }
 
         static void State()
@@ -1000,6 +1001,7 @@ internal class Dungeon
         this.player = player;
         monsters = new List<Monster>();
     }
+
     public void Stage1()
     {
         monsters.Clear();
